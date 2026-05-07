@@ -1,19 +1,50 @@
-const express = require("express");
+const express = require('express');
+const path = require('path');
+
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Разрешаем JSON для будущей регистрации
-app.use(express.json());
+// Раздаём статические файлы из папки public
+app.use(express.static('public'));
 
-// КЛЮЧЕВАЯ КОМАНДА: отдаём все файлы из папки
-app.use(express.static(__dirname));
-
-// Простая проверка
-app.get("/ping", (req, res) => {
-    res.json({ message: "pong" });
+// Главная страница (корневой путь)
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'main_page.html'));
 });
 
-// Запуск сервера
-app.listen(3000, () => {
-    console.log("✅ Сервер запущен!");
-    console.log("🌐 Открой в браузере: http://localhost:3000/register.html");
+// Обработка всех HTML страниц
+app.get('/register.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'register.html'));
+});
+
+app.get('/main_page.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'main_page.html'));
+});
+
+app.get('/support.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'support.html'));
+});
+
+app.get('/rules.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'rules.html'));
+});
+
+app.get('/banned_mods.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'banned_mods.html'));
+});
+
+app.get('/appeal.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'appeal.html'));
+});
+
+app.get('/profile.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'profile.html'));
+});
+
+app.get('/admin.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
+app.listen(PORT, () => {
+    console.log(`✅ Сервер запущен на порту ${PORT}`);
 });
