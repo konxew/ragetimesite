@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поддержка - RageTime</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0c0912; font-family: 'Inter', sans-serif; color: #edf2ff; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+        .navbar { background: rgba(11,8,18,0.96); backdrop-filter: blur(12px); border-bottom: 1px solid #2a1f2e; padding: 16px 0; position: sticky; top: 0; z-index: 200; }
+        .nav-flex { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        .logo h1 { 
+            font-size: 1.9rem; font-weight: 800;
+            background: linear-gradient(270deg, #ff7b9e, #e83c6c, #ff6b8a, #ff8e53, #ff7b9e);
+            background-size: 300% 300%;
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+            animation: logoShine 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 15px rgba(232, 60, 108, 0.5));
+        }
+        @keyframes logoShine {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .logo a { text-decoration: none; }
+        .nav-links { display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; flex: 1; }
+        .nav-links a { 
+            color: #edf2ff; 
+            text-decoration: none; 
+            font-weight: 500; 
+            transition: 0.2s; 
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nav-links a i { 
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        .nav-links a:hover { 
+            color: #ff5c8a; 
+        }
+        .nav-links a:hover i { 
+            transform: translateY(-2px);
+            color: #ff5c8a;
+        }
+        .user-info { display: flex; align-items: center; gap: 15px; background: #1a1628; padding: 6px 16px; border-radius: 40px; }
+        .role-badge { padding: 2px 8px; border-radius: 20px; font-size: 11px; }
+        .role-badge.admin { background: #e83c6c; }
+        .role-badge.moderator { background: #ff8c42; }
+        .role-badge.support { background: #3a86ff; }
+        .logout-btn { background: #e83c6c; border: none; padding: 6px 16px; border-radius: 30px; color: white; cursor: pointer; transition: 0.2s; }
+        .logout-btn:hover { background: #ff5c8a; transform: scale(0.95); }
+        .card { background: #15121e; border-radius: 28px; border: 1px solid #2a2332; padding: 35px; margin: 40px 0; }
+        .support-form { display: flex; flex-direction: column; gap: 20px; }
+        .support-form input, .support-form select, .support-form textarea { background: #0a0712; border: 1px solid #2f2740; padding: 14px; border-radius: 20px; color: white; font-family: inherit; }
+        .support-form input:focus, .support-form select:focus, .support-form textarea:focus { outline: none; border-color: #e83c6c; }
+        .btn-primary { background: #e83c6c; border: none; padding: 12px 28px; border-radius: 40px; color: white; cursor: pointer; width: fit-content; transition: 0.2s; }
+        .btn-primary:disabled { background: #555; cursor: not-allowed; transform: none; }
+        .btn-primary:hover:not(:disabled) { background: #ff5c8a; transform: scale(0.98); }
+        .footer { text-align: center; padding: 30px; color: #9d9bb8; border-top: 1px solid #252031; margin-top: 50px; }
+        .success-msg { background: rgba(0,255,0,0.1); border: 1px solid #44ff44; border-radius: 12px; padding: 10px; margin-bottom: 20px; color: #88ff88; }
+        .error-msg { background: rgba(255,0,0,0.1); border: 1px solid #ff4444; border-radius: 12px; padding: 10px; margin-bottom: 20px; color: #ff8888; }
+        .warning-msg { background: rgba(255,170,68,0.1); border: 1px solid #ffaa44; border-radius: 12px; padding: 10px; margin-bottom: 20px; color: #ffaa44; }
+        .timer-info { font-size: 13px; color: #ffaa44; margin-top: 10px; text-align: center; }
+        .ticket-counter { 
+            display: flex; align-items: center; gap: 10px; margin-bottom: 15px; 
+            padding: 12px 18px; background: rgba(232,60,108,0.08); border-radius: 16px; font-size: 14px; 
+        }
+        .ticket-counter .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .dot.used { background: #e83c6c; }
+        .dot.available { background: #2ecc71; box-shadow: 0 0 8px rgba(46,204,113,0.5); }
+        
+        /* ЗАГРУЗКА ФАЙЛОВ */
+        .file-upload-area {
+            background: #0a0712;
+            border: 2px dashed #2f2740;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .file-upload-area:hover {
+            border-color: #e83c6c;
+            background: #0f0b18;
+        }
+        .file-upload-area.drag-over {
+            border-color: #2ecc71;
+            background: rgba(46,204,113,0.05);
+        }
+        .file-upload-icon {
+            font-size: 48px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+        .file-upload-text {
+            color: #aaa;
+            font-size: 14px;
+        }
+        .file-upload-text span {
+            color: #ff7b9e;
+            font-weight: 600;
+        }
+        .file-limit {
+            color: #666;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+        .file-input {
+            display: none;
+        }
+        .file-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .file-item {
+            background: #1a1628;
+            border-radius: 14px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            position: relative;
+        }
+        .file-item .file-icon {
+            font-size: 20px;
+        }
+        .file-item .file-icon.image { color: #2ecc71; }
+        .file-item .file-icon.video { color: #e83c6c; }
+        .file-item .file-name {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .file-item .file-size {
+            color: #888;
+            font-size: 11px;
+        }
+        .file-item .file-remove {
+            background: none;
+            border: none;
+            color: #ff4444;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0 4px;
+        }
+        .file-item .file-remove:hover {
+            color: #ff0000;
+        }
+        
+        .rules-card { background: #15121e; border-radius: 28px; border: 1px solid #2a2332; padding: 35px; margin: 40px 0; }
+        .rules-card h2 { margin-bottom: 25px; font-size: 1.5rem; display: flex; align-items: center; gap: 12px; }
+        .rule-block { 
+            background: #0f0c18; border-radius: 20px; padding: 25px; margin-bottom: 20px;
+            border-left: 3px solid #e83c6c;
+        }
+        .rule-block h3 { color: #ff7b9e; margin-bottom: 15px; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
+        .rule-block h4 { color: #ffaa44; margin: 15px 0 10px; font-size: 0.95rem; }
+        .rule-form { 
+            background: #0a0712; border-radius: 14px; padding: 18px; margin: 12px 0;
+            font-size: 14px; color: #bbb; line-height: 1.8;
+        }
+        .rule-form span { color: #ff7b9e; font-weight: 600; }
+        .rule-note { 
+            background: rgba(255,170,68,0.08); border: 1px solid rgba(255,170,68,0.2); 
+            border-radius: 12px; padding: 12px; margin: 10px 0; font-size: 13px; color: #ffaa44; 
+        }
+        .forbidden-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+        .forbidden-tag { 
+            background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.3);
+            padding: 5px 12px; border-radius: 20px; font-size: 12px; color: #ff6666; 
+        }
+        .return-info {
+            background: rgba(46,204,113,0.05); border: 1px solid rgba(46,204,113,0.2);
+            border-radius: 12px; padding: 15px; margin: 10px 0; font-size: 13px; color: #88cc88;
+        }
+        .deadline-info { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 10px; }
+        .deadline-tag {
+            background: rgba(232,60,108,0.1); border: 1px solid rgba(232,60,108,0.3);
+            padding: 8px 16px; border-radius: 20px; font-size: 13px; color: #ff7b9e;
+        }
+        @media (max-width: 700px) { .nav-flex { flex-direction: column; } .nav-links { justify-content: center; } }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container nav-flex">
+        <div class="logo"><a href="main_page.html"><h1>RageTime</h1></a></div>
+        <div class="nav-links">
+            <a href="main_page.html"><i class="fas fa-home"></i> Главная</a>
+            <a href="support.html"><i class="fas fa-headset"></i> Поддержка</a>
+            <a href="rules.html"><i class="fas fa-gavel"></i> Правила</a>
+            <a href="banned_mods.html"><i class="fas fa-ban"></i> Запрещённые моды</a>
+            <a href="appeal.html"><i class="fas fa-balance-scale"></i> Апелляции</a>
+            <a href="profile.html"><i class="fas fa-user"></i> Мой профиль</a>
+        </div>
+        <div id="userInfoBlock"></div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="card">
+        <h2 style="margin-bottom: 20px;"><i class="fas fa-headset"></i> Центр поддержки</h2>
+        <div id="message"></div>
+        <div id="ticketLimitInfo" class="ticket-counter"></div>
+        <form id="supportForm" class="support-form">
+            <input type="text" id="ticketName" placeholder="Ваш игровой никнейм (введите с игры)" required>
+            <input type="email" id="ticketEmail" placeholder="Email для ответа" required>
+            <select id="ticketType" required>
+                <option value="">— Выберите тип обращения —</option>
+                <option value="Жалоба на игрока">⚠️ Жалоба на игрока</option>
+                <option value="Жалоба на КП состав">🛡️ Жалоба на КП состав</option>
+                <option value="Жалоба на Администрацию">👑 Жалоба на Администрацию</option>
+                <option value="Жалоба на Медиа состав">🎬 Жалоба на Медиа состав</option>
+                <option value="Возврат предметов/денег">💎 Возврат предметов/денег</option>
+                <option value="Техническая проблема">🖥 Техническая проблема</option>
+                <option value="Вопрос по проекту">❓ Вопрос по проекту</option>
+                <option value="Сотрудничество">🤝 Сотрудничество</option>
+                <option value="Другое">📝 Другое</option>
+            </select>
+            <textarea id="ticketMessage" rows="5" placeholder="Опишите вашу проблему подробно..." required></textarea>
+            
+            <div class="file-upload-area" id="fileUploadArea" onclick="document.getElementById('fileInput').click()">
+                <div class="file-upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                <div class="file-upload-text">
+                    <span>Нажмите</span> или перетащите файлы сюда<br>
+                    Фото и видео до 100 МБ
+                </div>
+                <div class="file-limit">
+                    Поддерживаемые форматы: JPG, PNG, GIF, MP4, WEBM, MOV
+                </div>
+                <input type="file" id="fileInput" class="file-input" multiple accept="image/*,video/*" onchange="handleFiles(this.files)">
+            </div>
+            <div class="file-preview" id="filePreview"></div>
+            
+            <button type="button" class="btn-primary" id="submitBtn"><i class="fas fa-paper-plane"></i> Отправить</button>
+        </form>
+        <div id="cooldownInfo" class="timer-info"></div>
+    </div>
+
+    <div class="rules-card">
+        <h2><i class="fas fa-gavel"></i> Правила подачи жалоб</h2>
+        
+        <div class="rule-block">
+            <h3><i class="fas fa-user-slash"></i> Жалоба на Игрока</h3>
+            <p style="color:#ff7b9e;font-weight:600;margin-bottom:10px;">Тема должна быть названа ником того Игрока, на которого вы жалуетесь.</p>
+            <div class="rule-form">
+                <span>Форма:</span><br>
+                - Игровой режим Анархия:<br>- Ваш ник:<br>- Ник Игрока сервера:<br>- Суть жалобы:<br>- Скриншот/видео (imgur/youtube/rutube):
+            </div>
+            <div class="rule-note"><i class="fas fa-info-circle"></i> На скрине должно быть чётко видно ваш ник и окно с наказанием.</div>
+            <h4>Запрещён:</h4>
+            <div class="forbidden-list">
+                <span class="forbidden-tag">Флуд</span><span class="forbidden-tag">Оффтоп</span><span class="forbidden-tag">Дублирование</span><span class="forbidden-tag">Оскорбления</span><span class="forbidden-tag">Реклама</span>
+            </div>
+        </div>
+
+        <div class="rule-block">
+            <h3><i class="fas fa-shield-alt"></i> Жалоба на КП состав</h3>
+            <p style="color:#ff7b9e;font-weight:600;margin-bottom:10px;">Тема - ник модератора.</p>
+            <div class="rule-form">
+                <span>Форма:</span><br>
+                - Игровой режим Анархия:<br>- Ваш ник:<br>- Ник сотрудника:<br>- Суть жалобы:<br>- Скриншот/видео:
+            </div>
+        </div>
+
+        <div class="rule-block">
+            <h3><i class="fas fa-crown"></i> Жалоба на Администрацию</h3>
+            <p style="color:#ff7b9e;font-weight:600;margin-bottom:10px;">Тема - ник администратора.</p>
+            <div class="rule-form">
+                <span>Форма:</span><br>
+                - Игровой режим Анархия:<br>- Ваш ник:<br>- Ник сотрудника:<br>- Суть жалобы:<br>- Скриншот/видео:
+            </div>
+        </div>
+
+        <div class="rule-block">
+            <h3><i class="fas fa-video"></i> Жалоба на Медиа состав</h3>
+            <p style="color:#ff7b9e;font-weight:600;margin-bottom:10px;">Тема - ник ютубера/тиктокера.</p>
+            <div class="rule-form">
+                <span>Форма:</span><br>
+                - Игровой режим Анархия:<br>- Ваш ник:<br>- Ник сотрудника:<br>- Суть жалобы:<br>- Скриншот/видео:
+            </div>
+        </div>
+
+        <div class="rule-block">
+            <h3><i class="fas fa-undo-alt"></i> Возврат предметов/денег</h3>
+            <p style="color:#ff7b9e;font-weight:600;margin-bottom:10px;">Название темы: Ник | Анархия <span style="color:#ff4444;">(неверное оформление = отказ)</span></p>
+            <div class="rule-form">
+                <span>Форма:</span><br>
+                Ваш ник:<br>Описание ситуации:<br>Причина (баг / КД / античит):<br>Доказательства: видео на YouTube
+            </div>
+            <div class="return-info">
+                <strong>Возврат возможен:</strong> Технический баг • Блокировка в КТ по вине сотрудника • Ложное срабатывание античита<br>
+                <strong>Важно:</strong> Решение принимает администрация • Возможен неполный возврат
+            </div>
+            <div class="deadline-info">
+                <span class="deadline-tag">Срок рассмотрения: до 48 часов</span>
+                <span class="deadline-tag">Срок подачи: до 3 дней</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer"><p>RageTime - поддержка работает круглосуточно</p></footer>
+
+<script>
+    function getSession() { const s = localStorage.getItem('ragetime_session'); if(!s) return null; const d=JSON.parse(s); if(d.expires<Date.now()){localStorage.removeItem('ragetime_session');return null;} return d; }
+    let currentUser = getSession();
+    if (!currentUser) { window.location.href = 'index.html'; }
+
+    function renderUserInfo() {
+        const block = document.getElementById('userInfoBlock');
+        if(currentUser) {
+            const roleNames = { admin: 'Admin', moderator: 'Moderator', support: 'Support', user: 'Пользователь', youtuber: 'YouTuber' };
+            block.innerHTML = `<div class="user-info"><span>${currentUser.username}</span><span class="role-badge ${currentUser.role}">${roleNames[currentUser.role] || currentUser.role}</span><button class="logout-btn" onclick="logout()">Выйти</button></div>`;
+        }
+    }
+    
+    function logout() { localStorage.removeItem('ragetime_session'); window.location.href = 'index.html'; }
+    
+    if (currentUser.email) {
+        document.getElementById('ticketEmail').value = currentUser.email;
+    }
+
+    const MAX_FILE_SIZE = 100 * 1024 * 1024;
+    let selectedFiles = [];
+
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    
+    fileUploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        fileUploadArea.classList.add('drag-over');
+    });
+    
+    fileUploadArea.addEventListener('dragleave', () => {
+        fileUploadArea.classList.remove('drag-over');
+    });
+    
+    fileUploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        fileUploadArea.classList.remove('drag-over');
+        handleFiles(e.dataTransfer.files);
+    });
+
+    function handleFiles(files) {
+        for (let file of files) {
+            if (file.size > MAX_FILE_SIZE) {
+                alert(`Файл "${file.name}" слишком большой! Максимум 100 МБ.`);
+                continue;
+            }
+            
+            if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
+                alert(`Файл "${file.name}" не поддерживается! Только фото и видео.`);
+                continue;
+            }
+            
+            if (selectedFiles.find(f => f.name === file.name && f.size === file.size)) {
+                continue;
+            }
+            
+            selectedFiles.push(file);
+        }
+        
+        renderFilePreview();
+    }
+
+    function removeFile(index) {
+        selectedFiles.splice(index, 1);
+        renderFilePreview();
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' Б';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' КБ';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' МБ';
+    }
+
+    function renderFilePreview() {
+        const preview = document.getElementById('filePreview');
+        
+        if (selectedFiles.length === 0) {
+            preview.innerHTML = '';
+            return;
+        }
+        
+        preview.innerHTML = selectedFiles.map((file, index) => {
+            const isImage = file.type.startsWith('image/');
+            const iconClass = isImage ? 'image' : 'video';
+            const icon = isImage ? 'fa-image' : 'fa-video';
+            
+            return `
+                <div class="file-item">
+                    <i class="fas ${icon} file-icon ${iconClass}"></i>
+                    <span class="file-name" title="${file.name}">${file.name}</span>
+                    <span class="file-size">${formatFileSize(file.size)}</span>
+                    <button class="file-remove" onclick="removeFile(${index})" title="Удалить">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function getTicketLimitData() {
+        const data = localStorage.getItem(`ticket_limit_${currentUser.username}`);
+        if (!data) return { count: 0, firstTicketTime: null, maxTickets: 2, cooldownHours: 5 };
+        return JSON.parse(data);
+    }
+
+    function saveTicketLimitData(data) {
+        localStorage.setItem(`ticket_limit_${currentUser.username}`, JSON.stringify(data));
+    }
+
+    function checkTicketLimit() {
+        const limitData = getTicketLimitData();
+        const now = Date.now();
+        if (!limitData.firstTicketTime || (now - limitData.firstTicketTime) > limitData.cooldownHours * 60 * 60 * 1000) {
+            return { allowed: true, remaining: limitData.maxTickets, used: 0, resetTime: null };
+        }
+        if (limitData.count >= limitData.maxTickets) {
+            const cooldownMs = limitData.cooldownHours * 60 * 60 * 1000;
+            return { allowed: false, remaining: 0, used: limitData.count, resetTime: new Date(limitData.firstTicketTime + cooldownMs) };
+        }
+        return { allowed: true, remaining: limitData.maxTickets - limitData.count, used: limitData.count, resetTime: new Date(limitData.firstTicketTime + limitData.cooldownHours * 60 * 60 * 1000) };
+    }
+
+    function updateCooldownDisplay() {
+        const check = checkTicketLimit();
+        const infoDiv = document.getElementById('cooldownInfo');
+        const submitBtn = document.getElementById('submitBtn');
+        const limitInfoDiv = document.getElementById('ticketLimitInfo');
+        const maxTickets = 2;
+        const dots = [];
+        for (let i = 0; i < maxTickets; i++) dots.push(`<span class="dot ${i < check.used ? 'used' : 'available'}"></span>`);
+        limitInfoDiv.innerHTML = `<i class="fas fa-chart-bar"></i> <span>Лимит заявок:</span> ${dots.join('')} <span style="margin-left:8px;">${check.remaining} из ${maxTickets} доступно</span>`;
+        
+        if (!check.allowed) {
+            submitBtn.disabled = true;
+            const resetTime = new Date(check.resetTime);
+            const diffMs = resetTime - new Date();
+            const hours = Math.floor(diffMs / (1000 * 60 * 60));
+            const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+            infoDiv.innerHTML = `<i class="fas fa-clock"></i> Лимит исчерпан! Доступно через ${hours} ч. ${minutes} мин.`;
+        } else {
+            submitBtn.disabled = false;
+            infoDiv.innerHTML = `<i class="fas fa-check-circle"></i> Доступно ${check.remaining} заявок(и).`;
+        }
+    }
+
+    function sendTicket() {
+        const check = checkTicketLimit();
+        if (!check.allowed) {
+            document.getElementById('message').innerHTML = `<div class="warning-msg">⚠️ Лимит заявок исчерпан!</div>`;
+            setTimeout(() => document.getElementById('message').innerHTML = '', 3000);
+            return;
+        }
+        
+        const name = document.getElementById('ticketName').value.trim();
+        const email = document.getElementById('ticketEmail').value.trim();
+        const type = document.getElementById('ticketType').value;
+        const message = document.getElementById('ticketMessage').value.trim();
+        const msgDiv = document.getElementById('message');
+        
+        if (!name || !email || !type || !message) {
+            msgDiv.innerHTML = '<div class="error-msg">❌ Заполните все поля! Введите ник с игры, email, тип и описание.</div>';
+            setTimeout(() => msgDiv.innerHTML = '', 3000);
+            return;
+        }
+        
+        if (!email.includes('@') || !email.includes('.')) {
+            msgDiv.innerHTML = '<div class="error-msg">❌ Введите корректный email!</div>';
+            setTimeout(() => msgDiv.innerHTML = '', 3000);
+            return;
+        }
+        
+        const filePromises = selectedFiles.map(file => {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve({ name: file.name, type: file.type, size: file.size, data: reader.result });
+                reader.readAsDataURL(file);
+            });
+        });
+        
+        Promise.all(filePromises).then(fileData => {
+            const tickets = JSON.parse(localStorage.getItem('support_tickets')) || [];
+            tickets.push({
+                id: Date.now(),
+                name, email, type, message,
+                status: 'pending',
+                createdAt: new Date().toLocaleString(),
+                answer: null,
+                files: fileData
+            });
+            localStorage.setItem('support_tickets', JSON.stringify(tickets));
+            
+            const limitData = getTicketLimitData();
+            if (!limitData.firstTicketTime) limitData.firstTicketTime = Date.now();
+            limitData.count = (limitData.count || 0) + 1;
+            saveTicketLimitData(limitData);
+            
+            msgDiv.innerHTML = '<div class="success-msg">✅ Заявка отправлена! Осталось заявок: ' + checkTicketLimit().remaining + '</div>';
+            document.getElementById('ticketMessage').value = '';
+            document.getElementById('ticketName').value = '';
+            selectedFiles = [];
+            renderFilePreview();
+            updateCooldownDisplay();
+            setTimeout(() => msgDiv.innerHTML = '', 5000);
+        });
+    }
+
+    setInterval(() => {
+        const limitData = getTicketLimitData();
+        if (limitData.firstTicketTime && (Date.now() - limitData.firstTicketTime) > limitData.cooldownHours * 60 * 60 * 1000) {
+            saveTicketLimitData({ count: 0, firstTicketTime: null, maxTickets: 2, cooldownHours: 5 });
+        }
+        updateCooldownDisplay();
+    }, 60000);
+    
+    renderUserInfo();
+    updateCooldownDisplay();
+    document.getElementById('submitBtn').addEventListener('click', sendTicket);
+    window.removeFile = removeFile;
+    window.logout = logout;
+</script>
+</body>
+</html>

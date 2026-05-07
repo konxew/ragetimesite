@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Апелляции - RageTime | Анархия 201/501</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0c0912; font-family: 'Inter', sans-serif; color: #edf2ff; }
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 24px; }
+        .navbar { background: rgba(11,8,18,0.96); backdrop-filter: blur(12px); border-bottom: 1px solid #2a1f2e; padding: 16px 0; position: sticky; top: 0; z-index: 200; }
+        .nav-flex { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        .logo h1 { 
+            font-size: 1.9rem; font-weight: 800;
+            background: linear-gradient(270deg, #ff7b9e, #e83c6c, #ff6b8a, #ff8e53, #ff7b9e);
+            background-size: 300% 300%;
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+            animation: logoShine 3s ease-in-out infinite;
+        }
+        @keyframes logoShine {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .logo a { text-decoration: none; }
+        .nav-links { display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; flex: 1; }
+        .nav-links a { 
+            color: #edf2ff; 
+            text-decoration: none; 
+            font-weight: 500; 
+            transition: 0.2s; 
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nav-links a i { 
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        .nav-links a:hover { 
+            color: #ff5c8a; 
+        }
+        .nav-links a:hover i { 
+            transform: translateY(-2px);
+            color: #ff5c8a;
+        }
+        .user-info { display: flex; align-items: center; gap: 15px; background: #1a1628; padding: 6px 16px; border-radius: 40px; }
+        .role-badge { padding: 2px 8px; border-radius: 20px; font-size: 11px; }
+        .role-badge.admin { background: #e83c6c; }
+        .role-badge.moderator { background: #ff8c42; }
+        .role-badge.support { background: #3a86ff; }
+        .logout-btn { background: #e83c6c; border: none; padding: 6px 16px; border-radius: 30px; color: white; cursor: pointer; transition: 0.2s; }
+        .logout-btn:hover { background: #ff5c8a; transform: scale(0.95); }
+        .card { background: #15121e; border-radius: 28px; border: 1px solid #2a2332; padding: 35px; margin: 40px 0; }
+        .appeal-form { display: flex; flex-direction: column; gap: 24px; }
+        .form-row { display: flex; flex-wrap: wrap; gap: 20px; }
+        .form-group { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-size: 14px; font-weight: 500; color: #bfb9e6; display: flex; align-items: center; gap: 8px; }
+        .form-group label i { width: 20px; color: #e83c6c; }
+        .form-group input, .form-group select, .form-group textarea { background: #0a0712; border: 1px solid #2f2740; padding: 14px; border-radius: 20px; color: white; font-family: inherit; transition: 0.2s; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #e83c6c; outline: none; }
+        .file-attach-area { background: #0a0712; border: 1px dashed #3a2e4a; border-radius: 24px; padding: 16px 20px; transition: 0.2s; }
+        .file-attach-area:hover { border-color: #e83c6c; background: #100d1a; }
+        .file-label { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; cursor: pointer; }
+        .file-label i { font-size: 28px; color: #e83c6c; }
+        .file-info { font-size: 13px; color: #9d9bb8; margin-top: 8px; }
+        .file-preview { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; background: #1a1628; padding: 12px; border-radius: 18px; }
+        .preview-thumb { max-width: 100px; max-height: 80px; border-radius: 12px; object-fit: cover; border: 1px solid #3a2e4a; }
+        .preview-video { max-width: 180px; max-height: 100px; border-radius: 12px; }
+        .remove-file { background: #e83c6c20; border: none; color: #ff8888; padding: 4px 12px; border-radius: 30px; cursor: pointer; font-size: 12px; }
+        .btn-primary { background: #e83c6c; border: none; padding: 14px 32px; border-radius: 40px; color: white; cursor: pointer; width: fit-content; transition: 0.2s; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary:disabled { background: #555; cursor: not-allowed; transform: none; }
+        .btn-primary:hover:not(:disabled) { background: #ff5c8a; transform: scale(0.98); }
+        .footer { text-align: center; padding: 30px; color: #9d9bb8; border-top: 1px solid #252031; margin-top: 50px; }
+        .success-msg { background: rgba(0,255,0,0.1); border: 1px solid #44ff44; border-radius: 16px; padding: 14px; margin-bottom: 20px; color: #88ff88; display: flex; align-items: center; gap: 12px; }
+        .error-msg { background: rgba(255,0,0,0.1); border: 1px solid #ff4444; border-radius: 16px; padding: 14px; margin-bottom: 20px; color: #ff8888; }
+        .warning-msg { background: rgba(255,170,68,0.1); border: 1px solid #ffaa44; border-radius: 16px; padding: 14px; margin-bottom: 20px; color: #ffaa44; }
+        .appeal-counter { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; padding: 14px 20px; background: rgba(232,60,108,0.08); border-radius: 24px; font-size: 14px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin: 0 2px; }
+        .dot.used { background: #e83c6c; }
+        .dot.available { background: #2ecc71; box-shadow: 0 0 6px rgba(46,204,113,0.5); }
+        .timer-info { font-size: 13px; background: #1e1a2a; border-radius: 20px; padding: 10px 16px; margin-top: 12px; text-align: center; }
+        @media (max-width: 750px) { .nav-flex { flex-direction: column; } .form-row { flex-direction: column; } .card { padding: 24px; } }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container nav-flex">
+        <div class="logo"><a href="main_page.html"><h1>RageTime</h1></a></div>
+        <div class="nav-links">
+            <a href="main_page.html"><i class="fas fa-home"></i> Главная</a>
+            <a href="support.html"><i class="fas fa-headset"></i> Поддержка</a>
+            <a href="rules.html"><i class="fas fa-gavel"></i> Правила</a>
+            <a href="banned_mods.html"><i class="fas fa-ban"></i> Запрещённые моды</a>
+            <a href="appeal.html"><i class="fas fa-balance-scale"></i> Апелляции</a>
+            <a href="profile.html"><i class="fas fa-user"></i> Мой профиль</a>
+        </div>
+        <div id="userInfoBlock"></div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="card">
+        <h2 style="margin-bottom: 8px;"><i class="fas fa-gavel"></i> Обжалование наказания - Анархия</h2>
+        <p style="margin-bottom: 24px; color: #b8b4df;">Выберите ваш игровой режим (Анархия 201 / Анархия 501). Вы можете прикрепить фото или видео до 100 МБ. Ответ придёт в личные сообщения на платформе.</p>
+        <div id="globalMessage"></div>
+        <div id="appealLimitInfo" class="appeal-counter"></div>
+
+        <form id="appealForm" class="appeal-form">
+            <div class="form-group">
+                <label><i class="fas fa-gamepad"></i> Игровой режим *</label>
+                <select id="gameMode" required>
+                    <option value="Анархия - 201">⚔️ Анархия - 201</option>
+                    <option value="Анархия - 501">🔥 Анархия - 501</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-user-circle"></i> Ваш игровой ник *</label>
+                    <input type="text" id="appealUsername" placeholder="Введите ваш игровой никнейм" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-ban"></i> Причина *</label>
+                    <select id="appealReason" required>
+                        <option value="Читы/эксплойты">🚫 Читы / эксплойты</option>
+                        <option value="Нарушение правил чата">💬 Оскорбления / флуд</option>
+                        <option value="Ошибочная блокировка">❓ Ошибочная блокировка</option>
+                        <option value="Нечестная игра">🎲 Нечестная игра</option>
+                        <option value="Дюп / баг-юз">💎 Дюп / использование багов</option>
+                        <option value="Другое">📝 Другое</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-alt"></i> Дата выдачи наказания *</label>
+                    <input type="date" id="penaltyDate" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-user-shield"></i> Кто выдал (ник модератора) *</label>
+                    <input type="text" id="moderatorName" placeholder="Модератор или система" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-comment-dots"></i> Суть обжалования *</label>
+                    <textarea id="appealMessage" rows="4" placeholder="Опишите ситуацию: почему блокировка ошибочна / просьба о разбане, приведите аргументы, детали..." required></textarea>
+                </div>
+            </div>
+
+            <div class="file-attach-area">
+                <div class="file-label" onclick="document.getElementById('fileInput').click();">
+                    <i class="fas fa-cloud-upload-alt fa-2x"></i>
+                    <div>
+                        <strong>Прикрепить доказательства</strong><br>
+                        <span style="font-size: 12px;">Видео (MP4, MOV, AVI) или Фото (JPG, PNG, GIF) до 100 МБ</span>
+                    </div>
+                </div>
+                <input type="file" id="fileInput" accept="image/*,video/*" style="display: none;">
+                <div class="file-info"><i class="fas fa-info-circle"></i> Выберите файл. Можно только один файл (видео или фото) до 100 МБ.</div>
+                <div id="filePreviewBlock" class="file-preview" style="display: none;"></div>
+            </div>
+
+            <button type="button" class="btn-primary" id="submitBtn"><i class="fas fa-paper-plane"></i> Отправить апелляцию</button>
+        </form>
+        <div id="cooldownInfo" class="timer-info"></div>
+    </div>
+</div>
+
+<footer class="footer"><p>RageTime - каждое обращение рассматривается индивидуально. Доказательства (фото/видео, до 100 МБ) сохраняются в системе.</p></footer>
+
+<script>
+    // ------------------- СЕССИЯ -------------------
+    function getSession() { 
+        const s = localStorage.getItem('ragetime_session'); 
+        if(!s) return null; 
+        const d=JSON.parse(s); 
+        if(d.expires<Date.now()){localStorage.removeItem('ragetime_session');return null;} 
+        return d; 
+    }
+    let currentUser = getSession();
+    if (!currentUser) { window.location.href = 'index.html'; }
+
+    function renderUserInfo() {
+        const block = document.getElementById('userInfoBlock');
+        if(currentUser) {
+            const roleNames = { admin: 'Admin', moderator: 'Moderator', support: 'Support', user: 'Пользователь', youtuber: 'YouTuber' };
+            block.innerHTML = `<div class="user-info"><span>${currentUser.username}</span><span class="role-badge ${currentUser.role}">${roleNames[currentUser.role] || currentUser.role}</span><button class="logout-btn" onclick="logout()">Выйти</button></div>`;
+        }
+    }
+    function logout() { localStorage.removeItem('ragetime_session'); window.location.href = 'index.html'; }
+    
+    if(!document.getElementById('penaltyDate').value) {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('penaltyDate').value = today;
+    }
+
+    // ------------------- РАБОТА С ЛИМИТОМ (2 апелляции / 5 часов) -------------------
+    function getAppealLimitData() {
+        const data = localStorage.getItem(`appeal_limit_${currentUser.username}`);
+        if (!data) {
+            return { count: 0, firstAppealTime: null, maxAppeals: 2, cooldownHours: 5 };
+        }
+        return JSON.parse(data);
+    }
+    function saveAppealLimitData(data) {
+        localStorage.setItem(`appeal_limit_${currentUser.username}`, JSON.stringify(data));
+    }
+    function checkAppealLimit() {
+        const limitData = getAppealLimitData();
+        const now = Date.now();
+        if (!limitData.firstAppealTime || (now - limitData.firstAppealTime) > limitData.cooldownHours * 60 * 60 * 1000) {
+            return { allowed: true, remaining: limitData.maxAppeals, used: 0, resetTime: null };
+        }
+        if (limitData.count >= limitData.maxAppeals) {
+            const timeElapsed = now - limitData.firstAppealTime;
+            const cooldownMs = limitData.cooldownHours * 60 * 60 * 1000;
+            const remainingMs = cooldownMs - timeElapsed;
+            return { allowed: false, remaining: 0, used: limitData.count, resetTime: new Date(limitData.firstAppealTime + cooldownMs) };
+        }
+        return { allowed: true, remaining: limitData.maxAppeals - limitData.count, used: limitData.count, resetTime: new Date(limitData.firstAppealTime + limitData.cooldownHours * 60 * 60 * 1000) };
+    }
+    
+    function updateCooldownDisplay() {
+        const check = checkAppealLimit();
+        const submitBtn = document.getElementById('submitBtn');
+        const limitInfoDiv = document.getElementById('appealLimitInfo');
+        const cooldownDiv = document.getElementById('cooldownInfo');
+        const maxAppeals = 2;
+        const used = check.used;
+        let dots = '';
+        for (let i = 0; i < maxAppeals; i++) {
+            dots += `<span class="dot ${i < used ? 'used' : 'available'}"></span>`;
+        }
+        limitInfoDiv.innerHTML = `<i class="fas fa-chart-simple"></i> <span>Лимит апелляций:</span> ${dots} <span style="margin-left: 8px;">${check.remaining} из ${maxAppeals} доступно</span>`;
+        if (!check.allowed) {
+            submitBtn.disabled = true;
+            const resetTime = new Date(check.resetTime);
+            const diffMs = resetTime - Date.now();
+            const hours = Math.floor(diffMs / (1000 * 60 * 60));
+            const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+            cooldownDiv.innerHTML = `<i class="fas fa-hourglass-half"></i> Лимит исчерпан! Новые апелляции доступны через ${hours} ч. ${minutes} мин. (примерно ${resetTime.toLocaleTimeString()})`;
+        } else {
+            submitBtn.disabled = false;
+            if (check.used > 0 && check.resetTime) {
+                const resetTime = new Date(check.resetTime);
+                cooldownDiv.innerHTML = `<i class="fas fa-clock"></i> Осталось ${check.remaining} апелляция(и). Сброс лимита в ${resetTime.toLocaleTimeString()}.`;
+            } else {
+                cooldownDiv.innerHTML = `<i class="fas fa-check-circle"></i> Доступно ${check.remaining} апелляция(и).`;
+            }
+        }
+    }
+
+    // ------------------- ФАЙЛЫ (до 100 МБ) -------------------
+    let selectedFile = null;
+    let fileBase64 = null;
+
+    function getFileSizeMB(sizeBytes) { return (sizeBytes / (1024 * 1024)).toFixed(2); }
+
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const previewBlock = document.getElementById('filePreviewBlock');
+        if (!file) {
+            selectedFile = null;
+            fileBase64 = null;
+            previewBlock.style.display = 'none';
+            previewBlock.innerHTML = '';
+            return;
+        }
+        const maxSizeMB = 100;
+        if (file.size > maxSizeMB * 1024 * 1024) {
+            document.getElementById('globalMessage').innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-triangle"></i> Файл превышает 100 МБ! Выберите другой.</div>`;
+            setTimeout(() => document.getElementById('globalMessage').innerHTML = '', 4000);
+            document.getElementById('fileInput').value = '';
+            selectedFile = null;
+            fileBase64 = null;
+            previewBlock.style.display = 'none';
+            return;
+        }
+        selectedFile = file;
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            fileBase64 = ev.target.result;
+            const isVideo = file.type.startsWith('video/');
+            previewBlock.style.display = 'flex';
+            let previewHtml = '';
+            if (isVideo) {
+                previewHtml = `<video class="preview-video" controls><source src="${fileBase64}" type="${file.type}"></video>`;
+            } else {
+                previewHtml = `<img class="preview-thumb" src="${fileBase64}" alt="preview">`;
+            }
+            previewHtml += `<div style="display: flex; align-items: center; gap: 12px;"><span style="font-size:13px;">${file.name} (${getFileSizeMB(file.size)} МБ)</span>
+                            <button type="button" class="remove-file" id="removeFileBtn"><i class="fas fa-trash-alt"></i> Удалить</button></div>`;
+            previewBlock.innerHTML = previewHtml;
+            const removeBtn = document.getElementById('removeFileBtn');
+            if(removeBtn) removeBtn.onclick = () => { 
+                selectedFile = null; 
+                fileBase64 = null; 
+                document.getElementById('fileInput').value = ''; 
+                previewBlock.style.display = 'none';
+                previewBlock.innerHTML = '';
+                const msgDiv = document.getElementById('globalMessage');
+                msgDiv.innerHTML = `<div class="success-msg" style="background:#1f1b2e;"><i class="fas fa-trash"></i> Файл удалён</div>`;
+                setTimeout(() => msgDiv.innerHTML = '', 2000);
+            };
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // ------------------- ОТПРАВКА АПЕЛЛЯЦИИ -------------------
+    async function sendAppeal() {
+        const check = checkAppealLimit();
+        if (!check.allowed) {
+            document.getElementById('globalMessage').innerHTML = `<div class="warning-msg"><i class="fas fa-hourglass-end"></i> Лимит апелляций исчерпан! Подождите сброса.</div>`;
+            setTimeout(() => document.getElementById('globalMessage').innerHTML = '', 3500);
+            return;
+        }
+        
+        const gameMode = document.getElementById('gameMode').value;
+        const username = document.getElementById('appealUsername').value.trim();
+        const reason = document.getElementById('appealReason').value;
+        const penaltyDate = document.getElementById('penaltyDate').value;
+        const moderatorName = document.getElementById('moderatorName').value.trim();
+        const appealMsg = document.getElementById('appealMessage').value.trim();
+
+        if (!username || !moderatorName || !appealMsg || !penaltyDate) {
+            document.getElementById('globalMessage').innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-circle"></i> Заполните все обязательные поля! (игровой ник, дата, модератор, суть)</div>`;
+            setTimeout(() => document.getElementById('globalMessage').innerHTML = '', 3500);
+            return;
+        }
+        
+        if (username.length < 2) {
+            document.getElementById('globalMessage').innerHTML = `<div class="error-msg"><i class="fas fa-exclamation-circle"></i> Введите корректный игровой никнейм!</div>`;
+            setTimeout(() => document.getElementById('globalMessage').innerHTML = '', 3500);
+            return;
+        }
+
+        const allAppeals = JSON.parse(localStorage.getItem('appeals')) || [];
+        const newAppeal = {
+            id: Date.now(),
+            username: username,
+            gameMode: gameMode,
+            banReason: reason,
+            penaltyDate: penaltyDate,
+            moderatorName: moderatorName,
+            message: appealMsg,
+            attachment: fileBase64 || null,
+            attachmentName: selectedFile ? selectedFile.name : null,
+            attachmentType: selectedFile ? selectedFile.type : null,
+            status: 'pending',
+            createdAt: new Date().toLocaleString(),
+            answer: null,
+        };
+        allAppeals.push(newAppeal);
+        localStorage.setItem('appeals', JSON.stringify(allAppeals));
+
+        const limitData = getAppealLimitData();
+        if (!limitData.firstAppealTime) limitData.firstAppealTime = Date.now();
+        limitData.count = (limitData.count || 0) + 1;
+        saveAppealLimitData(limitData);
+
+        selectedFile = null;
+        fileBase64 = null;
+        document.getElementById('fileInput').value = '';
+        document.getElementById('filePreviewBlock').style.display = 'none';
+        document.getElementById('filePreviewBlock').innerHTML = '';
+        document.getElementById('appealMessage').value = '';
+        document.getElementById('moderatorName').value = '';
+        document.getElementById('appealUsername').value = '';
+        document.getElementById('gameMode').value = 'Анархия - 201';
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('penaltyDate').value = today;
+        
+        const updatedCheck = checkAppealLimit();
+        document.getElementById('globalMessage').innerHTML = `<div class="success-msg"><i class="fas fa-check-circle"></i> Апелляция отправлена! Осталось апелляций: ${updatedCheck.remaining}. Доказательства (до 100МБ) сохранены. Ответ придёт в ЛС на платформе.</div>`;
+        updateCooldownDisplay();
+        setTimeout(() => document.getElementById('globalMessage').innerHTML = '', 6000);
+    }
+
+    setInterval(() => {
+        const limitData = getAppealLimitData();
+        if (limitData.firstAppealTime && (Date.now() - limitData.firstAppealTime) > limitData.cooldownHours * 60 * 60 * 1000) {
+            saveAppealLimitData({ count: 0, firstAppealTime: null, maxAppeals: 2, cooldownHours: 5 });
+            updateCooldownDisplay();
+        }
+    }, 60000);
+
+    renderUserInfo();
+    updateCooldownDisplay();
+    document.getElementById('submitBtn').addEventListener('click', sendAppeal);
+    window.logout = logout;
+</script>
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель — RageTime</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0c0912; font-family: 'Inter', sans-serif; color: #edf2ff; padding: 40px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { background: linear-gradient(135deg, #ff7b9e, #e83c6c); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 30px; }
+        .card { background: #15121e; border-radius: 28px; border: 1px solid #2a2332; padding: 30px; margin-bottom: 30px; }
+        .card h2 { color: #ff7b9e; margin-bottom: 20px; }
+        .user-list { max-height: 400px; overflow-y: auto; }
+        .user-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #2a1f2e; }
+        .user-item:hover { background: #1d1929; }
+        .role-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; }
+        .role-badge.admin { background: #e83c6c; }
+        .role-badge.moderator { background: #ff8c42; }
+        .role-badge.support { background: #3a86ff; }
+        .role-badge.user { background: #555; }
+        .select-role { background: #0a0712; border: 1px solid #2f2740; padding: 6px 12px; border-radius: 12px; color: white; margin-left: 10px; }
+        .btn { background: #e83c6c; border: none; padding: 6px 16px; border-radius: 20px; color: white; cursor: pointer; margin-left: 10px; }
+        .btn:hover { background: #ff5c8a; }
+        .success { background: rgba(0,255,0,0.1); border: 1px solid #44ff44; padding: 15px; border-radius: 16px; margin-bottom: 20px; color: #88ff88; }
+        .back-link { color: #ff8aae; text-decoration: none; display: inline-block; margin-bottom: 20px; }
+        .current-user { background: #1a1628; padding: 15px; border-radius: 20px; margin-bottom: 20px; border-left: 4px solid #e83c6c; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="main_page.html" class="back-link"><i class="fas fa-arrow-left"></i> На главную</a>
+    <h1><i class="fas fa-shield-alt"></i> Админ-панель RageTime</h1>
+    
+    <div id="message"></div>
+    
+    <div class="card">
+        <h2><i class="fas fa-user-cog"></i> Управление ролями</h2>
+        <div id="userList" class="user-list"></div>
+    </div>
+    
+    <div class="card">
+        <h2><i class="fas fa-plus-circle"></i> Выдать роль по нику</h2>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+            <input type="text" id="targetNick" placeholder="Никнейм" style="background:#0a0712; border:1px solid #2f2740; padding: 10px 16px; border-radius: 20px; color: white; flex: 1;">
+            <select id="roleToAssign" style="background:#0a0712; border:1px solid #2f2740; padding: 10px 16px; border-radius: 20px; color: white;">
+                <option value="admin">👑 Admin</option>
+                <option value="moderator">🛡️ Moderator</option>
+                <option value="support">🎧 Support</option>
+                <option value="user">👤 Пользователь</option>
+                <option value="youtuber">📹 YouTuber</option>
+                <option value="blacklist">🚫 Чёрный список</option>
+            </select>
+            <button class="btn" onclick="assignRoleByNick()">Выдать роль</button>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h2><i class="fas fa-chart-line"></i> Статистика</h2>
+        <div id="stats"></div>
+    </div>
+</div>
+
+<script>
+    function getUsers() { const u = localStorage.getItem('ragetime_users'); return u ? JSON.parse(u) : []; }
+    function saveUsers(users) { localStorage.setItem('ragetime_users', JSON.stringify(users)); }
+    
+    // Функция для выдачи роли konxew
+    function giveKonxewAdmin() {
+        let users = getUsers();
+        let konxew = users.find(u => u.username === 'konxew');
+        if (konxew) {
+            if (konxew.role !== 'admin') {
+                konxew.role = 'admin';
+                saveUsers(users);
+                console.log('✅ konxew теперь администратор!');
+            }
+        } else {
+            // Если пользователь konxew не зарегистрирован - создать
+            let newUser = {
+                id: Date.now(),
+                username: 'konxew',
+                email: 'konxew@ragetime.su',
+                password: '',
+                role: 'admin',
+                registeredAt: new Date().toISOString()
+            };
+            users.push(newUser);
+            saveUsers(users);
+            console.log('✅ Создан пользователь konxew с ролью admin');
+        }
+    }
+    
+    // Выдать роль по нику
+    function assignRoleByNick() {
+        let nickname = document.getElementById('targetNick').value.trim();
+        let newRole = document.getElementById('roleToAssign').value;
+        let msgDiv = document.getElementById('message');
+        
+        if (!nickname) {
+            msgDiv.innerHTML = '<div class="success" style="border-color:#ff4444; color:#ff8888;">❌ Введите никнейм</div>';
+            setTimeout(() => msgDiv.innerHTML = '', 3000);
+            return;
+        }
+        
+        let users = getUsers();
+        let user = users.find(u => u.username === nickname);
+        
+        if (!user) {
+            msgDiv.innerHTML = `<div class="success" style="border-color:#ff4444; color:#ff8888;">❌ Пользователь "${nickname}" не найден</div>`;
+            setTimeout(() => msgDiv.innerHTML = '', 3000);
+            return;
+        }
+        
+        user.role = newRole;
+        saveUsers(users);
+        msgDiv.innerHTML = `<div class="success">✅ Пользователю ${nickname} выдана роль ${newRole}</div>`;
+        setTimeout(() => msgDiv.innerHTML = '', 3000);
+        renderUserList();
+        updateStats();
+        
+        // Если меняем роль текущего пользователя — обновляем сессию
+        let session = localStorage.getItem('ragetime_session');
+        if (session) {
+            let sessionData = JSON.parse(session);
+            if (sessionData.username === nickname) {
+                sessionData.role = newRole;
+                localStorage.setItem('ragetime_session', JSON.stringify(sessionData));
+            }
+        }
+    }
+    
+    // Выдать роль через кнопку в списке
+    function assignRole(userId, newRole) {
+        let users = getUsers();
+        let user = users.find(u => u.id === userId);
+        if (user) {
+            user.role = newRole;
+            saveUsers(users);
+            renderUserList();
+            updateStats();
+            
+            // Обновляем сессию если это текущий пользователь
+            let session = localStorage.getItem('ragetime_session');
+            if (session) {
+                let sessionData = JSON.parse(session);
+                if (sessionData.username === user.username) {
+                    sessionData.role = newRole;
+                    localStorage.setItem('ragetime_session', JSON.stringify(sessionData));
+                }
+            }
+        }
+    }
+    
+    // Рендер списка пользователей
+    function renderUserList() {
+        let users = getUsers();
+        let container = document.getElementById('userList');
+        let roleNames = { admin: 'Admin', moderator: 'Moderator', support: 'Support', user: 'Пользователь', youtuber: 'YouTuber', blacklist: 'ЧС', staff: 'Staff' };
+        let roleColors = { admin: '#e83c6c', moderator: '#ff8c42', support: '#3a86ff', user: '#555', youtuber: '#ff0000', blacklist: '#333', staff: '#9b59b6' };
+        
+        if (users.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:20px;">Нет зарегистрированных пользователей</div>';
+            return;
+        }
+        
+        container.innerHTML = users.map(user => `
+            <div class="user-item">
+                <div>
+                    <i class="fas fa-user"></i> <strong>${user.username}</strong>
+                    <span class="role-badge" style="background: ${roleColors[user.role] || '#555'}; margin-left: 10px;">${roleNames[user.role] || user.role}</span>
+                </div>
+                <div>
+                    <select class="select-role" onchange="assignRole(${user.id}, this.value)">
+                        <option value="user" ${user.role === 'user' ? 'selected' : ''}>👤 Пользователь</option>
+                        <option value="support" ${user.role === 'support' ? 'selected' : ''}>🎧 Support</option>
+                        <option value="moderator" ${user.role === 'moderator' ? 'selected' : ''}>🛡️ Moderator</option>
+                        <option value="youtuber" ${user.role === 'youtuber' ? 'selected' : ''}>📹 YouTuber</option>
+                        <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>👑 Admin</option>
+                        <option value="blacklist" ${user.role === 'blacklist' ? 'selected' : ''}>🚫 ЧС</option>
+                    </select>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function updateStats() {
+        let users = getUsers();
+        let statsDiv = document.getElementById('stats');
+        let admins = users.filter(u => u.role === 'admin').length;
+        let moderators = users.filter(u => u.role === 'moderator').length;
+        let supports = users.filter(u => u.role === 'support').length;
+        let usersCount = users.filter(u => u.role === 'user').length;
+        
+        statsDiv.innerHTML = `
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <div style="background:#0f0c18; padding:15px; border-radius:20px; text-align:center; flex:1;"><strong style="color:#e83c6c;">${users.length}</strong><br>Всего</div>
+                <div style="background:#0f0c18; padding:15px; border-radius:20px; text-align:center; flex:1;"><strong style="color:#e83c6c;">${admins}</strong><br>Admin</div>
+                <div style="background:#0f0c18; padding:15px; border-radius:20px; text-align:center; flex:1;"><strong style="color:#ff8c42;">${moderators}</strong><br>Moderator</div>
+                <div style="background:#0f0c18; padding:15px; border-radius:20px; text-align:center; flex:1;"><strong style="color:#3a86ff;">${supports}</strong><br>Support</div>
+                <div style="background:#0f0c18; padding:15px; border-radius:20px; text-align:center; flex:1;"><strong>${usersCount}</strong><br>Пользователи</div>
+            </div>
+        `;
+    }
+    
+    // Автоматически выдаём админа konxew при загрузке страницы
+    giveKonxewAdmin();
+    renderUserList();
+    updateStats();
+    
+    window.assignRole = assignRole;
+    window.assignRoleByNick = assignRoleByNick;
+</script>
+</body>
+</html>

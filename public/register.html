@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RageTime - Вход</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: linear-gradient(135deg, #0c0912 0%, #1a1528 100%); font-family: 'Inter', sans-serif; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
+        .container { width: 100%; max-width: 450px; padding: 20px; }
+        .form-box { background: rgba(21, 18, 30, 0.95); backdrop-filter: blur(10px); border-radius: 28px; border: 1px solid rgba(232, 60, 108, 0.3); padding: 40px; }
+        .form-box h2 { text-align: center; margin-bottom: 30px; font-size: 28px; background: linear-gradient(135deg, #ff7b9e, #e83c6c); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .input-group { margin-bottom: 20px; }
+        .input-group input { width: 100%; padding: 14px 16px; background: #0a0712; border: 1px solid #2f2740; border-radius: 16px; color: #fff; font-size: 14px; }
+        .input-group input:focus { outline: none; border-color: #e83c6c; }
+        .btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #e83c6c, #c01e4e); border: none; border-radius: 16px; color: white; font-size: 16px; font-weight: 600; cursor: pointer; }
+        .switch-form { text-align: center; margin-top: 20px; color: #9d9bb8; }
+        .switch-form a { color: #ff7b9e; cursor: pointer; }
+        .error-msg { background: rgba(255,0,0,0.1); border: 1px solid #ff4444; border-radius: 12px; padding: 10px; margin-bottom: 20px; color: #ff8888; font-size: 13px; text-align: center; }
+        .success-msg { background: rgba(0,255,0,0.1); border: 1px solid #44ff44; border-radius: 12px; padding: 10px; margin-bottom: 20px; color: #88ff88; text-align: center; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="form-box" id="loginForm">
+        <h2>Вход в аккаунт</h2>
+        <div id="loginMessage"></div>
+        <div class="input-group"><input type="text" id="loginUsername" placeholder="Логин"></div>
+        <div class="input-group"><input type="password" id="loginPassword" placeholder="Пароль"></div>
+        <button class="btn" onclick="login()">Войти</button>
+        <div class="switch-form">Нет аккаунта? <a onclick="showRegister()">Зарегистрироваться</a></div>
+    </div>
+    <div class="form-box" id="registerForm" style="display:none;">
+        <h2>Регистрация</h2>
+        <div id="registerMessage"></div>
+        <div class="input-group"><input type="text" id="regUsername" placeholder="Логин (мин. 3 символа)"></div>
+        <div class="input-group"><input type="email" id="regEmail" placeholder="Email"></div>
+        <div class="input-group"><input type="password" id="regPassword" placeholder="Пароль (мин. 6 символов)"></div>
+        <div class="input-group"><input type="password" id="regConfirmPassword" placeholder="Подтвердите пароль"></div>
+        <button class="btn" onclick="register()">Зарегистрироваться</button>
+        <div class="switch-form">Уже есть аккаунт? <a onclick="showLogin()">Войти</a></div>
+    </div>
+</div>
+
+<script>
+    async function hashPassword(p) { const e = new TextEncoder(); const d = e.encode(p); const h = await crypto.subtle.digest('SHA-256', d); return Array.from(new Uint8Array(h)).map(b => b.toString(16).padStart(2,'0')).join(''); }
+    
+    function getUsers() { const u = localStorage.getItem('ragetime_users'); if (u) return JSON.parse(u); return []; }
+    function saveUsers(users) { localStorage.setItem('ragetime_users', JSON.stringify(users)); }
+    
+    async function register() {
+        const username = document.getElementById('regUsername').value.trim();
+        const email = document.getElementById('regEmail').value.trim();
+        const password = document.getElementById('regPassword').value;
+        const confirm = document.getElementById('regConfirmPassword').value;
+        const msg = document.getElementById('registerMessage');
+        
+        if (username.length < 3) { msg.innerHTML = '<div class="error-msg">❌ Логин минимум 3 символа</div>'; return; }
+        if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) { msg.innerHTML = '<div class="error-msg">❌ Неверный email</div>'; return; }
+        if (password.length < 6) { msg.innerHTML = '<div class="error-msg">❌ Пароль минимум 6 символов</div>'; return; }
+        if (password !== confirm) { msg.innerHTML = '<div class="error-msg">❌ Пароли не совпадают</div>'; return; }
+        
+        const users = getUsers();
+        
+        // Защита от регистрации занятого логина
+        if (users.find(u => u.username === username)) { msg.innerHTML = '<div class="error-msg">❌ Логин уже занят</div>'; return; }
+        if (users.find(u => u.email === email)) { msg.innerHTML = '<div class="error-msg">❌ Email уже используется</div>'; return; }
+        
+        const hashedPassword = await hashPassword(password);
+        const newUser = { id: Date.now(), username: username, email: email, password: hashedPassword, role: 'user', registeredAt: new Date().toISOString() };
+        users.push(newUser);
+        saveUsers(users);
+        
+        msg.innerHTML = '<div class="success-msg">✅ Регистрация успешна! Теперь войдите.</div>';
+        setTimeout(() => showLogin(), 2000);
+    }
+    
+    async function login() {
+        const loginInput = document.getElementById('loginUsername').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        const msg = document.getElementById('loginMessage');
+        
+        const users = getUsers();
+        const user = users.find(u => u.username === loginInput || u.email === loginInput);
+        
+        if (!user) { msg.innerHTML = '<div class="error-msg">❌ Пользователь не найден</div>'; return; }
+        
+        const hashedInput = await hashPassword(password);
+        if (user.password !== hashedInput) { msg.innerHTML = '<div class="error-msg">❌ Неверный пароль</div>'; return; }
+        
+        const session = { userId: user.id, username: user.username, role: user.role, expires: Date.now() + 7*24*60*60*1000 };
+        localStorage.setItem('ragetime_session', JSON.stringify(session));
+        window.location.href = 'main_page.html';
+    }
+    
+    function showRegister() { loginForm.style.display = 'none'; registerForm.style.display = 'block'; }
+    function showLogin() { registerForm.style.display = 'none'; loginForm.style.display = 'block'; }
+    
+    const session = localStorage.getItem('ragetime_session');
+    if (session) { try { if (JSON.parse(session).expires > Date.now()) window.location.href = 'main_page.html'; } catch(e) {} }
+</script>
+</body>
+</html>

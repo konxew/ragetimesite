@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мой профиль - RageTime</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0c0912; font-family: 'Inter', sans-serif; color: #edf2ff; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+        
+        /* НАВИГАЦИЯ С ИКОНКАМИ */
+        .navbar { background: rgba(11,8,18,0.96); backdrop-filter: blur(12px); border-bottom: 1px solid #2a1f2e; padding: 16px 0; position: sticky; top: 0; z-index: 200; }
+        .nav-flex { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        .logo h1 { 
+            font-size: 1.9rem; font-weight: 800;
+            background: linear-gradient(270deg, #ff7b9e, #e83c6c, #ff6b8a, #ff8e53, #ff7b9e);
+            background-size: 300% 300%;
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+            animation: logoShine 3s ease-in-out infinite;
+        }
+        @keyframes logoShine {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .logo a { text-decoration: none; }
+        .nav-links { display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; flex: 1; }
+        .nav-links a { 
+            color: #edf2ff; 
+            text-decoration: none; 
+            font-weight: 500; 
+            transition: 0.2s; 
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nav-links a i { 
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        .nav-links a:hover { 
+            color: #ff5c8a; 
+        }
+        .nav-links a:hover i { 
+            transform: translateY(-2px);
+            color: #ff5c8a;
+        }
+        .user-info { display: flex; align-items: center; gap: 15px; background: #1a1628; padding: 6px 16px; border-radius: 40px; }
+        .role-badge { padding: 2px 8px; border-radius: 20px; font-size: 11px; }
+        .role-badge.admin { background: #e83c6c; }
+        .role-badge.moderator { background: #ff8c42; }
+        .role-badge.support { background: #3a86ff; }
+        .logout-btn { background: #e83c6c; border: none; padding: 6px 16px; border-radius: 30px; color: white; cursor: pointer; transition: 0.2s; }
+        .logout-btn:hover { background: #ff5c8a; transform: scale(0.95); }
+        
+        /* КАРТОЧКА ПРОФИЛЯ */
+        .card { background: linear-gradient(135deg, #15121e 0%, #110e18 100%); border-radius: 32px; border: 1px solid rgba(232,60,108,0.2); margin-bottom: 28px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .card-header { padding: 20px 28px; background: linear-gradient(135deg, rgba(232,60,108,0.08), rgba(255,123,158,0.03)); border-bottom: 1px solid #2a1f2e; }
+        .card-header h2 { font-weight: 800; display: flex; align-items: center; gap: 12px; font-size: 1.6rem; background: linear-gradient(135deg, #fff, #ff7b9e); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        
+        /* ТАБЫ */
+        .tabs { display: flex; gap: 12px; margin: 20px 28px; flex-wrap: wrap; }
+        .tab-btn { background: #1a1628; border: 1px solid #2a1f2e; padding: 10px 26px; border-radius: 40px; color: #ccc; cursor: pointer; font-weight: 600; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
+        .tab-btn i { font-size: 1rem; }
+        .tab-btn:hover { background: #2a1f30; border-color: #ff7b9e; transform: translateY(-2px); }
+        .tab-btn.active { background: #e83c6c; border-color: #e83c6c; color: white; box-shadow: 0 4px 15px rgba(232,60,108,0.3); }
+        
+        .tab-pane { display: none; padding: 0 28px 28px 28px; }
+        .tab-pane.active-pane { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* ЭЛЕМЕНТЫ ЗАЯВОК И АПЕЛЛЯЦИЙ */
+        .ticket-item, .appeal-item { background: #0a0712; border-radius: 20px; padding: 20px; margin-bottom: 16px; border: 1px solid #2a1f2e; transition: all 0.2s; }
+        .ticket-item:hover, .appeal-item:hover { border-color: #ff7b9e40; transform: translateX(4px); background: #0e0b16; }
+        
+        .ticket-title, .appeal-title { font-weight: 700; font-size: 1rem; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .ticket-title i, .appeal-title i { color: #ff7b9e; margin-right: 8px; }
+        
+        .status-pending { background: rgba(255,170,68,0.15); color: #ffaa44; padding: 4px 12px; border-radius: 30px; font-size: 11px; font-weight: 600; }
+        .status-answered { background: rgba(68,255,68,0.15); color: #44ff44; padding: 4px 12px; border-radius: 30px; font-size: 11px; font-weight: 600; }
+        .status-approved { background: rgba(68,255,68,0.15); color: #44ff44; padding: 4px 12px; border-radius: 30px; font-size: 11px; }
+        .status-deleted { background: rgba(231,76,60,0.2); color: #e74c3c; padding: 4px 12px; border-radius: 30px; font-size: 11px; font-weight: 600; }
+        
+        .ticket-meta { font-size: 0.7rem; color: #9d9bb8; margin-bottom: 12px; display: flex; gap: 15px; flex-wrap: wrap; }
+        .ticket-message { background: #0c0912; padding: 14px; border-radius: 16px; margin: 12px 0; font-size: 14px; line-height: 1.5; border-left: 3px solid #ff7b9e; }
+        .answer-box { background: linear-gradient(135deg, rgba(232,60,108,0.08), rgba(255,123,158,0.03)); border-left: 3px solid #2ecc71; padding: 14px; border-radius: 16px; margin-top: 12px; }
+        .deleted-box { background: rgba(231,76,60,0.08); border-left: 3px solid #e74c3c; padding: 14px; border-radius: 16px; margin-top: 12px; color: #ff8888; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #9d9bb8; background: #0a0712; border-radius: 24px; margin: 10px 0; }
+        .empty-state i { font-size: 48px; margin-bottom: 15px; opacity: 0.5; }
+        .empty-state a { color: #ff7b9e; text-decoration: none; font-weight: 600; }
+        .empty-state a:hover { text-decoration: underline; }
+        
+        .footer { text-align: center; padding: 30px; color: #9d9bb8; border-top: 1px solid #252031; margin-top: 50px; }
+        
+        @media (max-width: 700px) { 
+            .nav-flex { flex-direction: column; } 
+            .nav-links { justify-content: center; }
+            .tabs { margin: 15px; }
+            .tab-pane { padding: 0 15px 20px 15px; }
+            .ticket-title { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container nav-flex">
+        <div class="logo"><a href="main_page.html"><h1>RageTime</h1></a></div>
+        <div class="nav-links">
+            <a href="main_page.html"><i class="fas fa-home"></i> Главная</a>
+            <a href="support.html"><i class="fas fa-headset"></i> Поддержка</a>
+            <a href="rules.html"><i class="fas fa-gavel"></i> Правила</a>
+            <a href="banned_mods.html"><i class="fas fa-ban"></i> Запрещённые моды</a>
+            <a href="appeal.html"><i class="fas fa-balance-scale"></i> Апелляции</a>
+            <a href="profile.html"><i class="fas fa-user"></i> Мой профиль</a>
+        </div>
+        <div id="userInfoBlock"></div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h2><i class="fas fa-user-astronaut"></i> Личный кабинет</h2>
+        </div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('tickets')"><i class="fas fa-envelope"></i> Мои заявки</button>
+            <button class="tab-btn" onclick="showTab('appeals')"><i class="fas fa-gavel"></i> Мои апелляции</button>
+        </div>
+        <div id="userTicketsTab" class="tab-pane active-pane"><div id="userTicketsList"></div></div>
+        <div id="userAppealsTab" class="tab-pane"><div id="userAppealsList"></div></div>
+    </div>
+</div>
+
+<footer class="footer"><p>RageTime - Ваши обращения и ответы администрации</p></footer>
+
+<script>
+    // ====================== ОСНОВНЫЕ ФУНКЦИИ ======================
+    function getSession() { 
+        const s = localStorage.getItem('ragetime_session'); 
+        if(!s) return null; 
+        const d = JSON.parse(s); 
+        if(d.expires < Date.now()){ 
+            localStorage.removeItem('ragetime_session'); 
+            return null; 
+        } 
+        return d; 
+    }
+    
+    function getTickets() { 
+        const t = localStorage.getItem('support_tickets'); 
+        return t ? JSON.parse(t) : []; 
+    }
+    
+    function getAppeals() { 
+        const a = localStorage.getItem('appeals'); 
+        return a ? JSON.parse(a) : []; 
+    }
+    
+    let currentUser = getSession();
+    if (!currentUser) { window.location.href = 'index.html'; }
+    
+    function renderUserInfo() {
+        const block = document.getElementById('userInfoBlock');
+        if(currentUser) {
+            const roleNames = { admin: 'Admin', moderator: 'Moderator', support: 'Support', user: 'Пользователь', youtuber: 'YouTuber' };
+            block.innerHTML = `<div class="user-info"><span>${escapeHtml(currentUser.username)}</span><span class="role-badge ${currentUser.role}">${roleNames[currentUser.role] || currentUser.role}</span><button class="logout-btn" onclick="logout()">Выйти</button></div>`;
+        }
+    }
+    
+    function logout() { 
+        localStorage.removeItem('ragetime_session'); 
+        window.location.href = 'index.html'; 
+    }
+    
+    function escapeHtml(str) { 
+        if(!str) return ''; 
+        return str.replace(/[&<>]/g, function(m){ 
+            if(m === '&') return '&amp;'; 
+            if(m === '<') return '&lt;'; 
+            if(m === '>') return '&gt;'; 
+            return m; 
+        }); 
+    }
+    
+    // ====================== ОТОБРАЖЕНИЕ ЗАЯВОК (С УДАЛЁННЫМИ) ======================
+    function renderUserTickets() {
+        const tickets = getTickets();
+        // Показываем ВСЕ заявки пользователя, включая удалённые (удалённые помечаются статусом 'deleted')
+        // В системе удаление просто помечает ticket.status = 'deleted', но запись остаётся
+        const userTickets = tickets.filter(t => t.name === currentUser.username);
+        const container = document.getElementById('userTicketsList');
+        
+        if (userTickets.length === 0) {
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i>У вас пока нет заявок<br><a href="support.html">📝 Создать заявку</a></div>';
+            return;
+        }
+        
+        container.innerHTML = userTickets.map(ticket => {
+            let statusHtml = '';
+            let answerHtml = '';
+            let statusClass = '';
+            
+            if (ticket.status === 'deleted') {
+                statusHtml = '<span class="status-deleted"><i class="fas fa-trash-alt"></i> Удалено администрацией</span>';
+                statusClass = 'deleted';
+                answerHtml = `<div class="deleted-box"><i class="fas fa-exclamation-triangle"></i> <strong>Заявка была удалена модератором</strong><br>Текст заявки сохранён в архиве.</div>`;
+            } else if (ticket.status === 'pending') {
+                statusHtml = '<span class="status-pending"><i class="fas fa-clock"></i> Ожидает ответа</span>';
+                statusClass = 'pending';
+                if (ticket.answer) {
+                    answerHtml = `<div class="answer-box"><strong><i class="fas fa-reply"></i> Ответ администрации:</strong><br>${escapeHtml(ticket.answer)}<div style="font-size: 11px; color: #888; margin-top: 8px;">${ticket.answeredAt ? `Ответ получен: ${ticket.answeredAt}` : ''}</div></div>`;
+                }
+            } else if (ticket.status === 'answered') {
+                statusHtml = '<span class="status-answered"><i class="fas fa-check-circle"></i> Ответ получен</span>';
+                statusClass = 'answered';
+                answerHtml = `<div class="answer-box"><strong><i class="fas fa-reply"></i> Ответ администрации:</strong><br>${escapeHtml(ticket.answer)}<div style="font-size: 11px; color: #888; margin-top: 8px;">${ticket.answeredAt ? `Ответ получен: ${ticket.answeredAt}` : ''}</div></div>`;
+            }
+            
+            return `
+                <div class="ticket-item">
+                    <div class="ticket-title">
+                        <div><i class="fas fa-ticket-alt"></i> Заявка #${ticket.id}</div>
+                        ${statusHtml}
+                    </div>
+                    <div class="ticket-meta">
+                        <span><i class="far fa-calendar-alt"></i> ${ticket.createdAt || new Date(ticket.id).toLocaleString()}</span>
+                        <span><i class="fas fa-tag"></i> ${escapeHtml(ticket.type)}</span>
+                    </div>
+                    <div class="ticket-message"><strong>📝 Ваше сообщение:</strong><br>${escapeHtml(ticket.message)}</div>
+                    ${answerHtml}
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // ====================== ОТОБРАЖЕНИЕ АПЕЛЛЯЦИЙ (С УДАЛЁННЫМИ) ======================
+    function renderUserAppeals() {
+        const appeals = getAppeals();
+        // Показываем ВСЕ апелляции пользователя, включая удалённые (помечены статусом 'deleted')
+        const userAppeals = appeals.filter(a => a.username === currentUser.username);
+        const container = document.getElementById('userAppealsList');
+        
+        const statusText = { 
+            'pending': '⏳ На рассмотрении', 
+            'answered': '✅ Ответ дан', 
+            'approved': '✔️ Одобрена', 
+            'rejected': '❌ Отклонена',
+            'deleted': '🗑️ Удалена администрацией'
+        };
+        
+        if (userAppeals.length === 0) {
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-gavel"></i>У вас пока нет апелляций<br><a href="appeal.html">⚖️ Подать апелляцию</a></div>';
+            return;
+        }
+        
+        container.innerHTML = userAppeals.map(appeal => {
+            let statusClass = '';
+            let answerHtml = '';
+            let isDeleted = appeal.status === 'deleted';
+            
+            if (isDeleted) {
+                statusClass = 'deleted';
+                answerHtml = `<div class="deleted-box"><i class="fas fa-trash-alt"></i> <strong>Апелляция была удалена модератором</strong><br>Текст апелляции сохранён в архиве.</div>`;
+            } else {
+                statusClass = appeal.status === 'pending' ? 'pending' : (appeal.status === 'approved' ? 'approved' : 'answered');
+                if (appeal.answer) {
+                    answerHtml = `<div class="answer-box"><strong><i class="fas fa-gavel"></i> Решение администрации:</strong><br>${escapeHtml(appeal.answer)}<div style="font-size: 11px; color: #888; margin-top: 8px;">${appeal.answeredAt ? `Рассмотрено: ${appeal.answeredAt}` : ''}</div></div>`;
+                }
+            }
+            
+            // Доп. информация: режим, дата выдачи, модератор
+            let extraInfo = '';
+            if (appeal.gameMode || appeal.penaltyDate || appeal.moderatorName) {
+                extraInfo = `<div style="background: #0c0912; padding: 10px; border-radius: 14px; margin-bottom: 12px; font-size: 13px;">
+                                ${appeal.gameMode ? `<span style="color:#ff7b9e;">🎮 Режим:</span> ${escapeHtml(appeal.gameMode)} &nbsp;|&nbsp; ` : ''}
+                                ${appeal.penaltyDate ? `<span style="color:#ff7b9e;">📅 Дата выдачи:</span> ${escapeHtml(appeal.penaltyDate)} &nbsp;|&nbsp; ` : ''}
+                                ${appeal.moderatorName ? `<span style="color:#ff7b9e;">🛡️ Кто выдал:</span> ${escapeHtml(appeal.moderatorName)}` : ''}
+                            </div>`;
+            }
+            
+            return `
+                <div class="appeal-item">
+                    <div class="appeal-title">
+                        <div><i class="fas fa-balance-scale"></i> Апелляция #${appeal.id}</div>
+                        <span class="status-${statusClass}">${statusText[appeal.status] || appeal.status}</span>
+                    </div>
+                    <div class="ticket-meta">
+                        <span><i class="far fa-calendar-alt"></i> ${appeal.createdAt || new Date(appeal.id).toLocaleString()}</span>
+                        <span><i class="fas fa-ban"></i> ${escapeHtml(appeal.banReason || 'Не указана')}</span>
+                    </div>
+                    ${extraInfo}
+                    <div class="ticket-message"><strong>📝 Суть обжалования:</strong><br>${escapeHtml(appeal.message)}</div>
+                    ${answerHtml}
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // ====================== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ======================
+    function showTab(tab) {
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active-pane'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        
+        if (tab === 'tickets') {
+            document.getElementById('userTicketsTab').classList.add('active-pane');
+            document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            renderUserTickets();
+        } else if (tab === 'appeals') {
+            document.getElementById('userAppealsTab').classList.add('active-pane');
+            document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            renderUserAppeals();
+        }
+    }
+    
+    // ====================== ИНИЦИАЛИЗАЦИЯ ======================
+    renderUserInfo();
+    renderUserTickets();
+    
+    window.showTab = showTab;
+    window.logout = logout;
+</script>
+</body>
+</html>

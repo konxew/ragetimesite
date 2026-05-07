@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RageTime — Главная</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0c0912; font-family: 'Inter', sans-serif; color: #edf2ff; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
+        .navbar { background: rgba(11,8,18,0.96); backdrop-filter: blur(12px); border-bottom: 1px solid #2a1f2e; padding: 16px 0; position: sticky; top: 0; z-index: 200; }
+        .nav-flex { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        .logo h1 { font-size: 1.9rem; font-weight: 800; background: linear-gradient(135deg, #ff7b9e, #e83c6c); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .logo a { text-decoration: none; }
+        .nav-links { display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; flex: 1; }
+        .nav-links a { color: #edf2ff; text-decoration: none; font-weight: 500; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
+        .nav-links a i { font-size: 1rem; transition: 0.2s; }
+        .nav-links a:hover { color: #ff5c8a; }
+        .nav-links a:hover i { transform: translateY(-2px); color: #ff5c8a; }
+        .user-info { display: flex; align-items: center; gap: 15px; background: #1a1628; padding: 6px 16px; border-radius: 40px; }
+        .role-badge { padding: 2px 8px; border-radius: 20px; font-size: 11px; }
+        .role-badge.admin { background: #e83c6c; }
+        .role-badge.moderator { background: #ff8c42; }
+        .role-badge.support { background: #3a86ff; }
+        .logout-btn { background: #e83c6c; border: none; padding: 6px 16px; border-radius: 30px; color: white; cursor: pointer; }
+        .main-layout { display: flex; gap: 32px; margin: 40px 0; flex-wrap: wrap; }
+        .content-area { flex: 2; min-width: 280px; }
+        .sidebar { flex: 1.2; min-width: 260px; }
+        .forum-card { background: #15121e; border-radius: 28px; border: 1px solid #2a2332; margin-bottom: 28px; overflow: hidden; }
+        .card-header { padding: 18px 26px; background: rgba(232,60,108,0.06); border-bottom: 1px solid #2a1f2e; }
+        .card-header h3 { font-weight: 700; display: flex; align-items: center; gap: 12px; }
+        .admin-list, .youtuber-list { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 26px; }
+        .admin-tag, .youtuber-tag { background: #1a1628; padding: 8px 16px; border-radius: 40px; display: inline-flex; align-items: center; gap: 8px; }
+        .owner-text { font-weight: 700; color: #ff5555; }
+        .tech-text { font-weight: 700; color: #ff884d; }
+        .youtuber-text { color: #ff0000; font-weight: 700; }
+        .counter-card { background: #0f0c18; border-radius: 24px; padding: 20px; text-align: center; margin-bottom: 28px; border: 1px solid #2a2332; }
+        .counter-number { font-size: 2.8rem; font-weight: 800; background: linear-gradient(135deg, #2ecc71, #27ae60); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .online-users { background: #0f0c18; border-radius: 28px; padding: 20px; margin-top: 28px; border: 1px solid #2a2332; }
+        .user-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+        .chip { background: #201d2d; padding: 4px 12px; border-radius: 30px; font-size: 0.7rem; }
+        .admin-panel { background: #0f0c18; border-radius: 32px; padding: 30px; margin: 40px 0; border: 1px solid #e83c6c40; }
+        .admin-tabs { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
+        .admin-tab { background: #1a1628; border: none; padding: 10px 24px; border-radius: 40px; color: #ccc; cursor: pointer; }
+        .admin-tab.active { background: #e83c6c; color: white; }
+        .tickets-grid { display: flex; flex-direction: column; gap: 16px; max-height: 550px; overflow-y: auto; }
+        .ticket-card { background: #0a0712; border-radius: 24px; padding: 20px; border: 1px solid #2a1f2e; }
+        .ticket-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+        .ticket-author { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .ticket-type { background: rgba(232,60,108,0.15); padding: 4px 12px; border-radius: 30px; font-size: 11px; color: #ff7b9e; }
+        .ticket-status { padding: 4px 12px; border-radius: 30px; font-size: 11px; font-weight: 600; }
+        .status-pending { background: rgba(255,170,68,0.15); color: #ffaa44; }
+        .status-answered { background: rgba(68,255,68,0.15); color: #44ff44; }
+        .ticket-message { background: #0c0912; padding: 14px; border-radius: 18px; margin: 12px 0; color: #bbb; font-size: 13px; white-space: pre-wrap; }
+        .ticket-actions { display: flex; gap: 12px; margin-top: 12px; }
+        .btn-reply { background: #e83c6c; border: none; padding: 6px 18px; border-radius: 30px; color: white; cursor: pointer; }
+        .btn-delete { background: #e74c3c20; border: 1px solid #e74c3c; padding: 6px 18px; border-radius: 30px; color: #e74c3c; cursor: pointer; }
+        .btn-approve { background: #2ecc7120; border: 1px solid #2ecc71; padding: 6px 18px; border-radius: 30px; color: #2ecc71; cursor: pointer; }
+        .ticket-answer { background: #2ecc7110; border-left: 3px solid #2ecc71; padding: 12px; border-radius: 12px; margin-top: 12px; }
+        .social-section { background: #15121e; border-radius: 28px; padding: 30px; text-align: center; margin: 20px 0; }
+        .social-buttons { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .social-btn { background: #1a1a1a; border: 1px solid #333; padding: 10px 24px; border-radius: 40px; color: #aaa; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; }
+        .social-btn:hover { border-color: #e83c6c; color: white; }
+        .footer { text-align: center; padding: 30px; border-top: 1px solid #252031; margin-top: 40px; color: #888; }
+        .empty-state { text-align: center; padding: 40px; color: #666; }
+        .users-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+        .user-card { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #0a0712; border-radius: 20px; cursor: pointer; }
+        .role-menu { display: none; position: fixed; background: #1a1628; border: 1px solid #e83c6c; border-radius: 16px; padding: 8px; z-index: 1000; }
+        .role-menu div { padding: 8px 16px; cursor: pointer; }
+        .role-menu div:hover { background: #e83c6c; border-radius: 10px; }
+        .search-input { width: 100%; padding: 12px 20px; background: #0a0712; border: 1px solid #2a1f2e; border-radius: 40px; color: white; margin-bottom: 15px; }
+        @media (max-width: 800px) { .main-layout { flex-direction: column; } .nav-flex { flex-direction: column; } }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container nav-flex">
+        <div class="logo"><a href="main_page.html"><h1>RageTime</h1></a></div>
+        <div class="nav-links">
+            <a href="main_page.html"><i class="fas fa-home"></i> Главная</a>
+            <a href="support.html"><i class="fas fa-headset"></i> Поддержка</a>
+            <a href="rules.html"><i class="fas fa-gavel"></i> Правила</a>
+            <a href="banned_mods.html"><i class="fas fa-ban"></i> Запрещённые моды</a>
+            <a href="appeal.html"><i class="fas fa-balance-scale"></i> Апелляции</a>
+            <a href="profile.html"><i class="fas fa-user"></i> Мой профиль</a>
+        </div>
+        <div id="userInfoBlock"></div>
+    </div>
+</nav>
+
+<div class="container main-layout">
+    <div class="content-area">
+        <div class="forum-card"><div class="card-header"><h3><i class="fas fa-crown"></i> Администрация</h3></div><div class="admin-list"><span class="admin-tag"><span class="owner-text">Владелец</span> - Extinct</span><span class="admin-tag"><span class="owner-text">Владелец</span> - ch0_ovh</span><span class="admin-tag"><span class="tech-text">Тех.Админ</span> - ImNeDrey</span></div></div>
+        <div class="forum-card"><div class="card-header"><h3><i class="fab fa-youtube"></i> YouTube-блогеры</h3></div><div class="youtuber-list"><span class="youtuber-tag"><i class="fab fa-youtube"></i> Qwate</span></div></div>
+    </div>
+    <div class="sidebar">
+        <div class="counter-card"><h3>Всего посетило</h3><div class="counter-number" id="siteCounter">0</div><div>онлайн: <span id="onlineCount">0</span></div></div>
+        <div class="online-users"><strong>В сети:</strong><div id="onlineUsersList" class="user-chips"></div></div>
+    </div>
+</div>
+
+<div class="container" id="adminPanelContainer"></div>
+<div class="container"><div class="social-section"><div class="social-buttons"><a href="#" class="social-btn"><i class="fab fa-vk"></i> VK</a><a href="#" class="social-btn"><i class="fab fa-telegram"></i> Telegram</a><a href="#" class="social-btn"><i class="fab fa-discord"></i> Discord</a></div></div></div>
+<footer class="footer"><p>RageTime — сообщество</p></footer>
+
+<script>
+function getSession(){const s=localStorage.getItem('ragetime_session');if(!s)return null;const d=JSON.parse(s);if(d.expires<Date.now()){localStorage.removeItem('ragetime_session');return null;}return d;}
+function getUsers(){return JSON.parse(localStorage.getItem('ragetime_users')||'[]');}
+function saveUsers(u){localStorage.setItem('ragetime_users',JSON.stringify(u));}
+function getTickets(){return JSON.parse(localStorage.getItem('support_tickets')||'[]');}
+function saveTickets(t){localStorage.setItem('support_tickets',JSON.stringify(t));}
+function getAppeals(){return JSON.parse(localStorage.getItem('appeals')||'[]');}
+function saveAppeals(a){localStorage.setItem('appeals',JSON.stringify(a));}
+let currentUser=getSession();
+let sessions=JSON.parse(localStorage.getItem('ragetime_sessions')||'{}');
+let totalVisitors=parseInt(localStorage.getItem('total_visitors'))||0;
+if(!localStorage.getItem('visitor_counted')){totalVisitors++;localStorage.setItem('total_visitors',totalVisitors);localStorage.setItem('visitor_counted','true');}
+if(!currentUser){window.location.href='index.html';}
+function updateOnline(){
+    if(currentUser){sessions[currentUser.username]={username:currentUser.username,role:currentUser.role,lastSeen:Date.now()};localStorage.setItem('ragetime_sessions',JSON.stringify(sessions));}
+    const now=Date.now();for(let n in sessions){if(now-sessions[n].lastSeen>300000)delete sessions[n];}
+    localStorage.setItem('ragetime_sessions',JSON.stringify(sessions));
+    document.getElementById('onlineCount').innerText=Object.values(sessions).length;
+    document.getElementById('onlineUsersList').innerHTML=Object.values(sessions).map(u=>`<span class="chip">${escapeHtml(u.username)}</span>`).join('');
+    document.getElementById('siteCounter').innerText=totalVisitors.toLocaleString();
+}
+function logout(){if(currentUser&&sessions[currentUser.username])delete sessions[currentUser.username];localStorage.setItem('ragetime_sessions',JSON.stringify(sessions));localStorage.removeItem('ragetime_session');window.location.href='index.html';}
+function escapeHtml(str){if(!str)return'';return str.replace(/[&<>]/g,function(m){if(m==='&')return'&amp;';if(m==='<')return'&lt;';if(m==='>')return'&gt;';return m;});}
+function renderUserInfo(){const block=document.getElementById('userInfoBlock');if(currentUser){const roleNames={admin:'Admin',moderator:'Moderator',support:'Support',user:'Пользователь',youtuber:'YouTuber'};block.innerHTML=`<div class="user-info"><span>${escapeHtml(currentUser.username)}</span><span class="role-badge ${currentUser.role}">${roleNames[currentUser.role]||currentUser.role}</span><button class="logout-btn" onclick="logout()">Выйти</button></div>`;}}
+function assignRoleManually(username,newRole){let users=getUsers();let user=users.find(u=>u.username===username);if(user){user.role=newRole;saveUsers(users);alert(`${username} теперь ${newRole}`);renderAdminPanel();renderUserInfo();}}
+function showRoleMenu(userId,element){const menu=document.getElementById('roleMenu');const user=getUsers().find(u=>u.id==userId);if(!user)return;menu.innerHTML=`<div onclick="assignRoleManually('${user.username}','user')">👤 Пользователь</div><div onclick="assignRoleManually('${user.username}','support')">🎧 Support</div><div onclick="assignRoleManually('${user.username}','moderator')">🛡️ Moderator</div><div onclick="assignRoleManually('${user.username}','admin')">👑 Admin</div><div onclick="assignRoleManually('${user.username}','youtuber')">📹 YouTuber</div>`;menu.style.display='block';const rect=element.getBoundingClientRect();menu.style.left=rect.left+'px';menu.style.top=rect.bottom+5+'px';setTimeout(()=>{document.addEventListener('click',function closeMenu(e){if(!menu.contains(e.target)&&e.target!==element){menu.style.display='none';document.removeEventListener('click',closeMenu);}});},0);}
+function replyToTicket(id){const reply=prompt('Введите ответ на заявку:');if(!reply)return;let tickets=getTickets();let t=tickets.find(t=>t.id===id);if(t){t.status='answered';t.answer=reply;t.answeredAt=new Date().toLocaleString();saveTickets(tickets);renderAdminPanel();alert('✅ Ответ отправлен');}}
+function replyToAppeal(id){const reply=prompt('Введите ответ на апелляцию:');if(!reply)return;let appeals=getAppeals();let a=appeals.find(a=>a.id===id);if(a){a.status='answered';a.answer=reply;a.answeredAt=new Date().toLocaleString();saveAppeals(appeals);renderAdminPanel();alert('✅ Ответ отправлен');}}
+function deleteTicket(id){if(!confirm('Удалить заявку?'))return;saveTickets(getTickets().filter(t=>t.id!==id));renderAdminPanel();}
+function deleteAppeal(id){if(!confirm('Удалить апелляцию?'))return;saveAppeals(getAppeals().filter(a=>a.id!==id));renderAdminPanel();}
+function approveAppeal(id){if(!confirm('Одобрить апелляцию?'))return;let appeals=getAppeals();let a=appeals.find(a=>a.id===id);if(a){a.status='approved';a.answer='✅ Апелляция одобрена';saveAppeals(appeals);renderAdminPanel();alert('✅ Одобрено');}}
+function showTab(tab){document.getElementById('ticketsTab')&&(document.getElementById('ticketsTab').style.display='none');document.getElementById('appealsTab')&&(document.getElementById('appealsTab').style.display='none');document.getElementById('usersTab')&&(document.getElementById('usersTab').style.display='none');document.querySelectorAll('.admin-tab').forEach(btn=>btn.classList.remove('active'));if(tab==='tickets'){document.getElementById('ticketsTab').style.display='block';document.querySelectorAll('.admin-tab')[0].classList.add('active');}else if(tab==='appeals'){document.getElementById('appealsTab').style.display='block';document.querySelectorAll('.admin-tab')[1].classList.add('active');}else if(tab==='users'){document.getElementById('usersTab').style.display='block';document.querySelectorAll('.admin-tab')[2].classList.add('active');}}
+function searchUsers(){const term=document.getElementById('userSearchInput')?.value.toLowerCase()||'';const users=getUsers();const filtered=term?users.filter(u=>u.username.toLowerCase().includes(term)):users;const container=document.getElementById('usersGridContainer');if(container)container.innerHTML=filtered.map(u=>`<div class="user-card" onclick="showRoleMenu(${u.id}, this)"><div><i class="fas fa-user"></i> ${escapeHtml(u.username)}</div><span class="role-badge" style="background:${u.role==='admin'?'#e83c6c':u.role==='moderator'?'#ff8c42':'#555'}">${u.role}</span></div>`).join('');}
+function renderAdminPanel(){const container=document.getElementById('adminPanelContainer');if(!currentUser||(currentUser.role!=='admin'&&currentUser.role!=='moderator')){if(container)container.innerHTML='';return;}const tickets=getTickets();const appeals=getAppeals();const users=getUsers();const isAdmin=currentUser.role==='admin';let ticketsHtml=tickets.length===0?'<div class="empty-state">📭 Нет заявок</div>':`<div class="tickets-grid">${tickets.map(t=>`<div class="ticket-card"><div class="ticket-header"><div class="ticket-author"><i class="fas fa-user"></i> <strong>${escapeHtml(t.name)}</strong> <span class="ticket-type">${escapeHtml(t.type)}</span></div><div class="ticket-status ${t.status==='pending'?'status-pending':'status-answered'}">${t.status==='pending'?'⏳ Ожидает':'✅ Отвечено'}</div></div><div class="ticket-message">${escapeHtml(t.message)}</div>${t.answer?`<div class="ticket-answer"><strong>Ответ:</strong> ${escapeHtml(t.answer)}</div>`:''}<div class="ticket-actions"><button class="btn-reply" onclick="replyToTicket(${t.id})">✏️ Ответить</button><button class="btn-delete" onclick="deleteTicket(${t.id})">🗑️ Удалить</button></div></div>`).join('')}</div>`;let appealsHtml=appeals.length===0?'<div class="empty-state">📭 Нет апелляций</div>':`<div class="tickets-grid">${appeals.map(a=>`<div class="ticket-card"><div class="ticket-header"><div class="ticket-author"><i class="fas fa-gavel"></i> <strong>${escapeHtml(a.username)}</strong> <span class="ticket-type">${escapeHtml(a.banReason||'Причина')}</span></div><div class="ticket-status ${a.status==='pending'?'status-pending':a.status==='approved'?'status-approved':'status-answered'}">${a.status==='pending'?'⏳ Ожидает':a.status==='approved'?'✅ Одобрена':'❌ Отклонена'}</div></div><div class="ticket-message"><strong>Суть:</strong> ${escapeHtml(a.message)}</div>${a.answer?`<div class="ticket-answer"><strong>Ответ:</strong> ${escapeHtml(a.answer)}</div>`:''}<div class="ticket-actions"><button class="btn-reply" onclick="replyToAppeal(${a.id})">✏️ Ответить</button><button class="btn-delete" onclick="deleteAppeal(${a.id})">🗑️ Удалить</button>${a.status==='pending'?`<button class="btn-approve" onclick="approveAppeal(${a.id})">✅ Одобрить</button>`:''}</div></div>`).join('')}</div>`;let usersHtml='';if(isAdmin){usersHtml=`<div><input type="text" id="userSearchInput" class="search-input" placeholder="🔍 Поиск по нику..." oninput="searchUsers()"><div class="users-count">Всего: ${users.length}</div><div id="usersGridContainer" class="users-grid">${users.map(u=>`<div class="user-card" onclick="showRoleMenu(${u.id}, this)"><div><i class="fas fa-user"></i> ${escapeHtml(u.username)}</div><span class="role-badge" style="background:${u.role==='admin'?'#e83c6c':u.role==='moderator'?'#ff8c42':'#555'}">${u.role}</span></div>`).join('')}</div></div>`;}container.innerHTML=`<div class="admin-panel"><h3><i class="fas fa-shield-alt"></i> Панель ${currentUser.role==='admin'?'Администратора':'Модератора'}</h3><div class="admin-tabs"><button class="admin-tab active" onclick="showTab('tickets')"><i class="fas fa-envelope"></i> Заявки (${tickets.filter(t=>t.status==='pending').length})</button><button class="admin-tab" onclick="showTab('appeals')"><i class="fas fa-gavel"></i> Апелляции (${appeals.filter(a=>a.status==='pending').length})</button>${isAdmin?'<button class="admin-tab" onclick="showTab(\'users\')"><i class="fas fa-users"></i> Пользователи</button>':''}</div><div id="ticketsTab">${ticketsHtml}</div><div id="appealsTab" style="display:none;">${appealsHtml}</div>${isAdmin?`<div id="usersTab" style="display:none;">${usersHtml}</div>`:''}</div><div id="roleMenu" class="role-menu"></div>`;if(isAdmin&&document.getElementById('usersGridContainer'))searchUsers();}
+setInterval(()=>{updateOnline();renderAdminPanel();},15000);
+renderUserInfo();updateOnline();renderAdminPanel();
+window.logout=logout;window.assignRoleManually=assignRoleManually;window.showRoleMenu=showRoleMenu;window.replyToTicket=replyToTicket;window.replyToAppeal=replyToAppeal;window.deleteTicket=deleteTicket;window.deleteAppeal=deleteAppeal;window.approveAppeal=approveAppeal;window.showTab=showTab;window.searchUsers=searchUsers;
+</script>
+</body>
+</html>

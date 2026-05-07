@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Настройка админа</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: linear-gradient(135deg, #0c0912 0%, #1a1528 100%); 
+            font-family: 'Inter', sans-serif; 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            color: #edf2ff;
+        }
+        .box { 
+            background: rgba(21, 18, 30, 0.95); 
+            backdrop-filter: blur(10px); 
+            border-radius: 28px; 
+            border: 1px solid rgba(232, 60, 108, 0.3); 
+            padding: 40px; 
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        h2 { 
+            font-size: 24px; 
+            background: linear-gradient(135deg, #ff7b9e, #e83c6c); 
+            -webkit-background-clip: text; 
+            background-clip: text; 
+            color: transparent; 
+            margin-bottom: 25px; 
+        }
+        input { 
+            width: 100%; 
+            padding: 14px 16px; 
+            background: #0a0712; 
+            border: 1px solid #2f2740; 
+            border-radius: 16px; 
+            color: #fff; 
+            font-size: 14px; 
+            margin-bottom: 15px; 
+        }
+        button { 
+            width: 100%; 
+            padding: 14px; 
+            background: #e83c6c; 
+            border: none; 
+            border-radius: 16px; 
+            color: white; 
+            font-size: 16px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            margin-bottom: 10px;
+            transition: 0.2s;
+        }
+        button:hover { background: #ff5c8a; }
+        button.green { background: #2ecc71; }
+        button.green:hover { background: #27ae60; }
+        button.blue { background: #3a86ff; }
+        button.blue:hover { background: #2a76ef; }
+        .msg { 
+            padding: 10px; 
+            border-radius: 12px; 
+            margin-bottom: 15px; 
+            font-size: 13px; 
+        }
+        .success { background: rgba(0,255,0,0.1); border: 1px solid #44ff44; color: #88ff88; }
+        .error { background: rgba(255,0,0,0.1); border: 1px solid #ff4444; color: #ff8888; }
+        .info { 
+            background: rgba(232,60,108,0.1); 
+            border: 1px solid #e83c6c; 
+            color: #ff7b9e; 
+            font-size: 12px; 
+            margin-top: 15px; 
+            padding: 10px;
+            border-radius: 12px;
+        }
+        .user-list {
+            background: #0a0712;
+            border-radius: 16px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: left;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #1a1528;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+        .user-item:hover { background: #1a1528; }
+        .user-item:last-child { border-bottom: none; }
+        .role-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .role-admin { background: #e83c6c; }
+        .role-user { background: #555; }
+        .selected { background: #1a1528; border: 1px solid #e83c6c; }
+    </style>
+</head>
+<body>
+<div class="box">
+    <h2>🔧 Админ-панель</h2>
+    <div id="msg"></div>
+    
+    <!-- Главная кнопка - создать konxew -->
+    <button class="blue" onclick="createKonxew()">👑 Создать konxew (админ)</button>
+    <button class="green" onclick="forceCreateAdmin()">🆕 Создать admin/admin</button>
+    
+    <div style="margin: 20px 0; color: #888;">— или выбери пользователя —</div>
+    
+    <div class="user-list" id="userList">
+        <div style="color: #666; text-align: center;">Загрузка...</div>
+    </div>
+    
+    <button onclick="makeSelectedAdmin()" id="makeAdminBtn" disabled>👑 Сделать выбранного админом</button>
+    
+    <div class="info">
+        <strong>Важно:</strong> Открывай эту страницу в том же браузере, где будешь входить на сайт!<br>
+        После назначения — зайди на сайт под нужным логином.
+    </div>
+</div>
+
+<script>
+    let selectedUser = null;
+    
+    function getUsers() { 
+        const u = localStorage.getItem('ragetime_users'); 
+        return u ? JSON.parse(u) : []; 
+    }
+    function saveUsers(u) { 
+        localStorage.setItem('ragetime_users', JSON.stringify(u)); 
+    }
+
+    function showUsers() {
+        const users = getUsers();
+        const list = document.getElementById('userList');
+        
+        if (users.length === 0) {
+            list.innerHTML = '<div style="color: #666; text-align: center;">Пользователей нет</div>';
+            return;
+        }
+        
+        list.innerHTML = users.map(u => `
+            <div class="user-item" onclick="selectUser('${u.username}')" id="user_${u.username}">
+                <div>
+                    <strong>${u.username}</strong>
+                    <span style="color: #888; font-size: 12px; margin-left: 8px;">${u.email || ''}</span>
+                </div>
+                <span class="role-badge role-${u.role === 'admin' ? 'admin' : 'user'}">${u.role}</span>
+            </div>
+        `).join('');
+    }
+
+    function selectUser(username) {
+        selectedUser = username;
+        document.getElementById('makeAdminBtn').disabled = false;
+        document.querySelectorAll('.user-item').forEach(el => el.classList.remove('selected'));
+        const el = document.getElementById('user_' + username);
+        if (el) el.classList.add('selected');
+    }
+
+    function makeSelectedAdmin() {
+        const msg = document.getElementById('msg');
+        if (!selectedUser) {
+            msg.innerHTML = '<div class="msg error">❌ Выбери пользователя из списка</div>';
+            return;
+        }
+        const users = getUsers();
+        const user = users.find(u => u.username === selectedUser);
+        if (!user) {
+            msg.innerHTML = '<div class="msg error">❌ Пользователь не найден</div>';
+            return;
+        }
+        user.role = 'admin';
+        saveUsers(users);
+        msg.innerHTML = `<div class="msg success">✅ ${selectedUser} теперь админ! Выйди и зайди заново.</div>`;
+        showUsers();
+        document.getElementById('makeAdminBtn').disabled = true;
+        selectedUser = null;
+    }
+
+    // СОЗДАТЬ KONXEW
+    function createKonxew() {
+        const users = getUsers();
+        const msg = document.getElementById('msg');
+        
+        // Проверяем, есть ли уже konxew
+        const existing = users.find(u => u.username === 'konxew');
+        
+        if (existing) {
+            existing.role = 'admin';
+            saveUsers(users);
+            msg.innerHTML = '<div class="msg success">✅ konxew уже есть и теперь админ!<br>Зайди на сайт под ником <strong>konxew</strong></div>';
+        } else {
+            // Хэш пароля "admin"
+            users.push({
+                id: Date.now(),
+                username: 'konxew',
+                email: 'konxew@ragetime.com',
+                password: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',
+                role: 'admin',
+                registeredAt: new Date().toISOString()
+            });
+            saveUsers(users);
+            msg.innerHTML = '<div class="msg success">✅ konxew создан!<br>Логин: <strong>konxew</strong><br>Пароль: <strong>admin</strong><br>Зайди на сайт и войди!</div>';
+        }
+        
+        showUsers();
+    }
+
+    function forceCreateAdmin() {
+        const users = getUsers();
+        const msg = document.getElementById('msg');
+        const existingAdmin = users.find(u => u.username === 'admin');
+        
+        if (existingAdmin) {
+            existingAdmin.role = 'admin';
+            saveUsers(users);
+            msg.innerHTML = '<div class="msg success">✅ Админ обновлён!<br>Логин: <strong>admin</strong><br>Пароль: <strong>admin</strong></div>';
+        } else {
+            users.push({
+                id: Date.now() + 1,
+                username: 'admin',
+                email: 'admin@ragetime.com',
+                password: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',
+                role: 'admin',
+                registeredAt: new Date().toISOString()
+            });
+            saveUsers(users);
+            msg.innerHTML = '<div class="msg success">✅ Админ создан!<br>Логин: <strong>admin</strong><br>Пароль: <strong>admin</strong></div>';
+        }
+        showUsers();
+    }
+
+    showUsers();
+</script>
+</body>
+</html>

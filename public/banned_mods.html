@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Запрещённые моды - RageTime</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0c0912; font-family: 'Inter', sans-serif; color: #edf2ff; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+        
+        /* НАВИГАЦИЯ */
+        .navbar { background: rgba(11,8,18,0.96); backdrop-filter: blur(12px); border-bottom: 1px solid #2a1f2e; padding: 16px 0; position: sticky; top: 0; z-index: 200; }
+        .nav-flex { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        .logo h1 { 
+            font-size: 1.9rem; font-weight: 800;
+            background: linear-gradient(270deg, #ff7b9e, #e83c6c, #ff6b8a, #ff8e53, #ff7b9e);
+            background-size: 300% 300%;
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+            animation: logoShine 3s ease-in-out infinite;
+        }
+        @keyframes logoShine {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .logo a { text-decoration: none; }
+        .nav-links { display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; flex: 1; }
+        .nav-links a { color: #edf2ff; text-decoration: none; font-weight: 500; transition: 0.2s; font-size: 1rem; }
+        .nav-links a:hover { color: #ff5c8a; transform: translateY(-2px); }
+        .user-info { display: flex; align-items: center; gap: 15px; background: #1a1628; padding: 6px 16px; border-radius: 40px; }
+        .role-badge { padding: 2px 8px; border-radius: 20px; font-size: 11px; }
+        .role-badge.admin { background: #e83c6c; }
+        .role-badge.moderator { background: #ff8c42; }
+        .role-badge.support { background: #3a86ff; }
+        .logout-btn { background: #e83c6c; border: none; padding: 6px 16px; border-radius: 30px; color: white; cursor: pointer; transition: 0.2s; }
+        .logout-btn:hover { background: #ff5c8a; transform: scale(0.95); }
+        
+        /* ГЛАВНАЯ КАРТОЧКА */
+        .card {
+            background: linear-gradient(135deg, #15121e 0%, #110e18 100%);
+            border-radius: 32px;
+            border: 1px solid rgba(232,60,108,0.2);
+            padding: 40px;
+            margin: 40px 0;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(232,60,108,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(232,60,108,0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        .card h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #ff7b9e, #e83c6c);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .card h2 i {
+            background: none;
+            -webkit-background-clip: unset;
+            background-clip: unset;
+            color: #e83c6c;
+            font-size: 2rem;
+        }
+        
+        .subtitle {
+            color: #9d9bb8;
+            margin-bottom: 30px;
+            font-size: 1rem;
+            border-left: 3px solid #e83c6c;
+            padding-left: 16px;
+        }
+        
+        /* СЕТКА МОДОВ */
+        .mod-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 18px;
+            margin: 30px 0;
+        }
+        
+        .mod-item {
+            background: rgba(10,7,18,0.7);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(42,31,48,0.6);
+            border-radius: 20px;
+            padding: 18px 20px;
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: default;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .mod-item::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #e83c6c, #ff7b9e);
+            transition: width 0.3s ease;
+        }
+        
+        .mod-item:hover {
+            transform: translateY(-5px) translateX(5px);
+            border-color: rgba(232,60,108,0.5);
+            background: rgba(20,15,30,0.9);
+            box-shadow: 0 10px 25px rgba(232,60,108,0.2);
+        }
+        
+        .mod-item:hover::after {
+            width: 100%;
+        }
+        
+        .mod-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, rgba(232,60,108,0.2), rgba(255,123,158,0.1));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: #ff7b9e;
+            transition: 0.2s;
+        }
+        
+        .mod-item:hover .mod-icon {
+            background: linear-gradient(135deg, #e83c6c, #ff7b9e);
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .mod-name {
+            font-weight: 600;
+            font-size: 1rem;
+            letter-spacing: 0.3px;
+            color: #f0ecff;
+        }
+        
+        /* ИНФО-БЛОКИ */
+        .info-box {
+            margin-top: 30px;
+            padding: 20px 24px;
+            background: rgba(10,7,18,0.6);
+            border-radius: 24px;
+            border-left: 4px solid #2ecc71;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .info-box i {
+            font-size: 26px;
+            color: #2ecc71;
+        }
+        
+        .warning-box {
+            margin-top: 18px;
+            padding: 20px 24px;
+            background: linear-gradient(135deg, rgba(232,60,108,0.08), rgba(255,123,158,0.05));
+            border-radius: 24px;
+            border: 1px solid rgba(232,60,108,0.4);
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            transition: 0.2s;
+        }
+        
+        .warning-box i {
+            font-size: 32px;
+            color: #ff7b9e;
+            filter: drop-shadow(0 0 6px rgba(232,60,108,0.5));
+        }
+        
+        .warning-box strong {
+            color: #ff7b9e;
+            font-size: 1.1rem;
+        }
+        
+        .badge-ban {
+            background: #e83c6c;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-left: auto;
+            white-space: nowrap;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #9d9bb8;
+            border-top: 1px solid #252031;
+            margin-top: 40px;
+        }
+        
+        /* АНИМАЦИЯ ПОЯВЛЕНИЯ */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .mod-item {
+            animation: fadeInUp 0.4s ease forwards;
+            opacity: 0;
+        }
+        
+        .mod-item:nth-child(1) { animation-delay: 0.02s; }
+        .mod-item:nth-child(2) { animation-delay: 0.05s; }
+        .mod-item:nth-child(3) { animation-delay: 0.08s; }
+        .mod-item:nth-child(4) { animation-delay: 0.11s; }
+        .mod-item:nth-child(5) { animation-delay: 0.14s; }
+        .mod-item:nth-child(6) { animation-delay: 0.17s; }
+        .mod-item:nth-child(7) { animation-delay: 0.20s; }
+        .mod-item:nth-child(8) { animation-delay: 0.23s; }
+        .mod-item:nth-child(9) { animation-delay: 0.26s; }
+        .mod-item:nth-child(10) { animation-delay: 0.29s; }
+        .mod-item:nth-child(11) { animation-delay: 0.32s; }
+        .mod-item:nth-child(12) { animation-delay: 0.35s; }
+        .mod-item:nth-child(13) { animation-delay: 0.38s; }
+        .mod-item:nth-child(14) { animation-delay: 0.41s; }
+        .mod-item:nth-child(15) { animation-delay: 0.44s; }
+        .mod-item:nth-child(16) { animation-delay: 0.47s; }
+        .mod-item:nth-child(17) { animation-delay: 0.50s; }
+        .mod-item:nth-child(18) { animation-delay: 0.53s; }
+        
+        @media (max-width: 700px) {
+            .nav-flex { flex-direction: column; }
+            .card { padding: 24px; }
+            .mod-list { grid-template-columns: 1fr; }
+            .badge-ban { margin-left: 0; margin-top: 8px; }
+            .warning-box { flex-direction: column; text-align: center; }
+            .info-box { flex-direction: column; text-align: center; }
+        }
+        
+        /* Дополнительные мелкие детали */
+        .stats-badge {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            background: rgba(232,60,108,0.15);
+            backdrop-filter: blur(8px);
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #ff9bb5;
+            border: 1px solid rgba(232,60,108,0.3);
+        }
+        
+        @media (max-width: 800px) {
+            .stats-badge { position: relative; top: auto; right: auto; margin-bottom: 20px; display: inline-block; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- НАВИГАЦИЯ -->
+<nav class="navbar">
+    <div class="container nav-flex">
+        <div class="logo"><a href="main_page.html"><h1>RageTime</h1></a></div>
+        <div class="nav-links">
+            <a href="main_page.html"><i class="fas fa-home"></i> Главная</a>
+            <a href="support.html"><i class="fas fa-headset"></i> Поддержка</a>
+            <a href="rules.html"><i class="fas fa-gavel"></i> Правила</a>
+            <a href="banned_mods.html"><i class="fas fa-ban"></i> Запрещённые моды</a>
+            <a href="appeal.html"><i class="fas fa-balance-scale"></i> Апелляции</a>
+            <a href="profile.html"><i class="fas fa-user"></i> Мой профиль</a>
+        </div>
+        <div id="userInfoBlock"></div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="card">
+        <div class="stats-badge">
+            <i class="fas fa-shield-haltered"></i> 18+ запрещённых модов
+        </div>
+        <h2>
+            <i class="fas fa-skull-crossbones"></i> 
+            Запрещённые модификации
+        </h2>
+        <div class="subtitle">
+            ⚡ Использование любого из перечисленных модов = нарушение п. 2.2.4 правил проекта
+        </div>
+        
+        <div class="mod-list">
+            <div class="mod-item"><div class="mod-icon"><i class="fas fa-box"></i></div><div class="mod-name">Neat (чистка инвентаря)</div></div>
+            <div class="mod-item"><div class="mod-icon"><i class="fas fa-lock"></i></div><div class="mod-name">ChestStealer</div></div>
+            <div class="mod-item"><div class="mod-icon"><i class="fas fa-robot"></i></div><div class="mod-name">AutoMyst</div></div>
+            <div class="mod-item"><div class="mod-icon"><i class="fas fa-camera"></i></div><div class="mod-name">Freecam</div></div>
+            <div class="mod-item"><div class="mod-icon"><i class="fas fa-magic"></i></div><div class="mod-name">InventoryTotem</div></div>
+            <div class="mod-item"><div class="mod-icon"><i class="fas fa-eye"></i></div><div class="mod-name">X-ray / Wallhack</div></div>
+            <div class="mod-item"><div class="mod-icon"><i class="fas fa-route"></i></div><div class="mod-name">Baritone (авто-шахта)</div></div>
+            <div class="mod-item"><div class="mod-icon"><i class="fas fa-dollar-sign"></i></div><div class="mod-name">AutoSell</div></div>
+            <div class="mod-item"><div class="mod-icon"><i class="fas fa-shopping-cart"></i></div><div class="mod-name">AutoBuy / FastBuy</div></div>
+            <div class="mod-item"><div class="mod-icon"><i class="fas fa-gem"></i></div><div class="mod-name">DiamondGen (генерация ресурсов)</div></div>
+            <div class="mod-item"><div class="mod-icon"><i class="fas fa-arrows-alt"></i></div><div class="mod-name">InventoryMove</div></div>
+            <div class="mod-item"><div class="mod-icon"><i class="fas fa-map"></i></div><div class="mod-name">MiniMap с радаром игроков</div></div>
+            <div class="mod-item"><div class="mod-icon"><i class="fas fa-tachometer-alt"></i></div><div class="mod-name">AutoClicker</div></div>
+            <div class="mod-item"><div class="mod-icon"><i class="fas fa-crosshairs"></i></div><div class="mod-name">KillAura</div></div>
+            <div class="mod-item"><div class="mod-icon"><i class="fas fa-fighter-jet"></i></div><div class="mod-name">Fly / Speed / NoFall</div></div>
+            <div class="mod-item"><div class="mod-icon"><i class="fas fa-chart-line"></i></div><div class="mod-name">AimAssist / TriggerBot</div></div>
+            <div class="mod-item"><div class="mod-icon"><i class="fas fa-expand"></i></div><div class="mod-name">Scaffold</div></div>
+            <div class="mod-item"><div class="mod-icon"><i class="fas fa-fast-forward"></i></div><div class="mod-name">Reach (увеличение дистанции)</div></div>
+        </div>
+        
+        <div class="info-box">
+            <i class="fas fa-info-circle"></i>
+            <span style="flex:1;">📋 Список не является исчерпывающим. Любые модификации, дающие нечестное преимущество над другими игроками, запрещены администрацией.</span>
+        </div>
+        
+        <div class="warning-box">
+            <i class="fas fa-gavel"></i>
+            <div style="flex:1;">
+                <strong>⚠️ Санкция за использование:</strong> Блокировка игрового аккаунта на <strong style="color:#ffaa44;">14 дней</strong> согласно пункту 2.2.4 правил проекта. При повторном нарушении - перманентный бан.
+            </div>
+            <div class="badge-ban">
+                <i class="fas fa-ban"></i> БАН 14 ДНЕЙ
+            </div>
+        </div>
+        
+        <div style="margin-top: 25px; font-size: 13px; color: #777; text-align: center; border-top: 1px solid #252031; padding-top: 20px;">
+            <i class="fas fa-database"></i> Античит система RageTime автоматически фиксирует подозрительное поведение. Читерство не остаётся безнаказанным.
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <p><i class="fas fa-shield-virus"></i> RageTime - честная игра без читеров | Актуальный список обновляется ежедневно</p>
+</footer>
+
+<script>
+    function getSession() { 
+        const s = localStorage.getItem('ragetime_session'); 
+        if(!s) return null; 
+        const d = JSON.parse(s); 
+        if(d.expires < Date.now()) { 
+            localStorage.removeItem('ragetime_session'); 
+            return null; 
+        } 
+        return d; 
+    }
+    
+    let currentUser = getSession();
+    
+    function renderUserInfo() {
+        const block = document.getElementById('userInfoBlock');
+        if(currentUser) {
+            const roleNames = { admin: 'Admin', moderator: 'Moderator', support: 'Support', user: 'Пользователь', youtuber: 'YouTuber' };
+            block.innerHTML = `
+                <div class="user-info">
+                    <span>${escapeHtml(currentUser.username)}</span>
+                    <span class="role-badge ${currentUser.role}">${roleNames[currentUser.role] || currentUser.role}</span>
+                    <button class="logout-btn" onclick="logout()">Выйти</button>
+                </div>
+            `;
+        } else {
+            block.innerHTML = `<div class="user-info"><a href="index.html" style="color:#ff7b9e; text-decoration:none;"><i class="fas fa-sign-in-alt"></i> Войти</a></div>`;
+        }
+    }
+    
+    function logout() { 
+        localStorage.removeItem('ragetime_session'); 
+        window.location.href = 'index.html'; 
+    }
+    
+    function escapeHtml(str) {
+        if(!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if(m === '&') return '&amp;';
+            if(m === '<') return '&lt;';
+            if(m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    renderUserInfo();
+    window.logout = logout;
+</script>
+</body>
+</html>

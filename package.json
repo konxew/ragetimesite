@@ -1,0 +1,26 @@
+{
+  "name": "ragetime",
+  "version": "1.0.0",
+  "description": "RageTime Minecraft server website",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.22.1",
+    "express-rate-limit": "^6.11.2",
+    "express-session": "^1.19.0",
+    "helmet": "^7.2.0",
+    "multer": "^1.4.5-lts.1",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
